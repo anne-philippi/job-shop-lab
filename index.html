@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OPM 5610: Job Shop Scheduling Interactive Lab</title>
-  
+  <title>OPM 5610: Job Shop Scheduling Lab</title>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- KaTeX for crisp mathematical formulas -->
+
+  <!-- KaTeX for math typesetting -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
 
   <style>
-    /* 16 equal columns matching discrete time units 0 to 15 */
-    .gantt-grid {
-      display: grid;
-      grid-template-columns: repeat(16, minmax(0, 1fr));
-      height: 52px;
-      position: relative;
+    /* Robust, zero-dependency 16-column grid */
+    .timeline-16-cols {
+      display: grid !important;
+      grid-template-columns: repeat(16, minmax(0, 1fr)) !important;
+      width: 100%;
     }
-    .maintenance-zone {
+    .track-height {
+      height: 48px;
+    }
+    .maint-striped {
       background: repeating-linear-gradient(
         -45deg,
         rgba(239, 68, 68, 0.15),
@@ -30,215 +32,246 @@
         rgba(239, 68, 68, 0.35) 16px
       );
     }
-    .info-btn {
+    .info-circle {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 17px;
-      height: 17px;
+      width: 16px;
+      height: 16px;
       border-radius: 9999px;
-      font-size: 11px;
+      font-size: 10px;
       font-family: serif;
       font-style: italic;
-      background-color: #1e293b;
+      background: #0f172a;
       color: #38bdf8;
       border: 1px solid #38bdf8;
       cursor: pointer;
-      vertical-align: middle;
+      line-height: 1;
       transition: all 0.15s ease;
     }
-    .info-btn:hover {
-      background-color: #38bdf8;
+    .info-circle:hover {
+      background: #38bdf8;
       color: #0f172a;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-sky-500/30">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
 
   <!-- Main Container -->
   <main class="max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- Top Header & Quick Presets -->
-    <header class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <!-- Header & Presets -->
+    <header class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-2xl font-bold text-sky-400">OPM 5610: Job Shop Scheduling</h1>
-          <button class="info-btn" onclick="openConcept('jobshop')" title="About Job Shop Scheduling">i</button>
+          <h1 class="text-xl md:text-2xl font-bold text-sky-400">OPM 5610: Job Shop Scheduling</h1>
+          <button class="info-circle" onclick="openModal('jobshop')" title="Job Shop Scheduling">i</button>
         </div>
-        <p class="text-xs text-slate-400 mt-1">Interactive Mixed Integer Programming & Gantt Optimization Sandbox</p>
+        <p class="text-xs text-slate-400 mt-0.5">Interactive Gantt Sandbox, Big-M Disjunctive Formulations, and Extensions</p>
       </div>
-
       <div class="flex items-center gap-2">
-        <button id="btn-solution" class="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 rounded-lg text-xs font-semibold shadow-md shadow-sky-950 transition">
+        <button id="btn-solution" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 rounded text-xs font-semibold shadow transition">
           Load Exercise 1 Solution
         </button>
-        <button id="btn-reset" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition">
+        <button id="btn-reset" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-semibold transition">
           Reset All
         </button>
       </div>
     </header>
 
     <!-- Operation Selector Bar -->
-    <section class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
           <span>Active Operation</span>
-          <button class="info-btn" onclick="openConcept('precedence')" title="Routing Precedence">i</button>
-          <span class="text-slate-500 text-[11px] normal-case tracking-normal">(Click an op to select, then click a machine cell or step buttons)</span>
+          <button class="info-circle" onclick="openModal('precedence')" title="Technological Precedence">i</button>
+          <span class="text-slate-500 text-[11px] normal-case tracking-normal">(Select op, then click any column cell on its machine row)</span>
         </div>
         <div class="flex items-center gap-2 text-xs">
-          <span class="text-slate-400">Step start time:</span>
-          <button id="step-minus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 font-bold">−</button>
-          <button id="step-plus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 font-bold">+</button>
+          <span class="text-slate-400">Nudge start:</span>
+          <button id="nudge-minus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 font-bold">−</button>
+          <button id="nudge-plus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 font-bold">+</button>
         </div>
       </div>
-
-      <div class="flex flex-wrap items-center gap-2" id="op-btn-group">
-        <!-- Buttons injected dynamically -->
-      </div>
+      <div class="flex flex-wrap items-center gap-2" id="op-pills-container"></div>
     </section>
 
-    <!-- Gantt Board Canvas -->
-    <section class="bg-slate-900/90 rounded-xl border border-slate-800 p-5 shadow-xl space-y-3">
-      <div class="flex items-center justify-between pb-1">
-        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-          Gantt Chart
-          <button class="info-btn" onclick="openConcept('cmax')" title="About Makespan">i</button>
-        </h2>
+    <!-- Gantt Chart Canvas -->
+    <section class="bg-slate-900 rounded-xl border border-slate-800 p-4 md:p-5 space-y-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+          <span>Gantt Chart</span>
+          <button class="info-circle" onclick="openModal('cmax')" title="Makespan">i</button>
+        </div>
         <div class="flex items-center gap-4 text-xs font-mono text-slate-400">
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-sky-500"></span> Job 1: M3 &rarr; M2 &rarr; M1</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span> Job 2: M2 &rarr; M1 &rarr; M3</span>
         </div>
       </div>
 
-      <!-- Time Header -->
+      <!-- Time Header (16 columns fixed) -->
       <div class="flex items-center">
-        <div class="w-20 text-xs font-mono text-slate-500 font-bold uppercase tracking-wider">Machine</div>
-        <div class="flex-1 grid grid-cols-16 text-center text-xs font-mono text-slate-400 border-b border-slate-800 pb-1">
+        <div class="w-16 md:w-20 text-[11px] font-mono text-slate-500 font-bold uppercase tracking-wider">Machine</div>
+        <div class="flex-1 timeline-16-cols text-center text-xs font-mono text-slate-400 border-b border-slate-800 pb-1">
           <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div>
           <div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div>
         </div>
       </div>
 
-      <!-- Machine Rows -->
-      <div class="space-y-2.5">
-        <div class="flex items-center">
-          <div class="w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> M<sub>1</sub>
-            <button class="info-btn text-[10px]" onclick="openConcept('alpha')" title="Machine Index">i</button>
-          </div>
-          <div class="flex-1 gantt-grid bg-slate-950/70 rounded-lg border border-slate-800/80 overflow-hidden" data-machine="1"></div>
+      <!-- Machine 1 Track -->
+      <div class="flex items-center">
+        <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> M<sub>1</sub>
+          <button class="info-circle text-[9px]" onclick="openModal('alpha')" title="Machine α">i</button>
         </div>
+        <div class="flex-1 timeline-16-cols track-height bg-slate-950/80 rounded border border-slate-800 relative" data-machine="1"></div>
+      </div>
 
-        <div class="flex items-center">
-          <div class="w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-indigo-400"></span> M<sub>2</sub>
-            <button class="info-btn text-[10px]" onclick="openConcept('alpha')" title="Machine Index">i</button>
-          </div>
-          <div class="flex-1 gantt-grid bg-slate-950/70 rounded-lg border border-slate-800/80 overflow-hidden" data-machine="2"></div>
+      <!-- Machine 2 Track -->
+      <div class="flex items-center">
+        <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400"></span> M<sub>2</sub>
+          <button class="info-circle text-[9px]" onclick="openModal('alpha')" title="Machine α">i</button>
         </div>
+        <div class="flex-1 timeline-16-cols track-height bg-slate-950/80 rounded border border-slate-800 relative" data-machine="2"></div>
+      </div>
 
-        <div class="flex items-center">
-          <div class="w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span> M<sub>3</sub>
-            <button class="info-btn text-[10px]" onclick="openConcept('alpha')" title="Machine Index">i</button>
-          </div>
-          <div class="flex-1 gantt-grid bg-slate-950/70 rounded-lg border border-slate-800/80 overflow-hidden" data-machine="3"></div>
+      <!-- Machine 3 Track -->
+      <div class="flex items-center">
+        <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span> M<sub>3</sub>
+          <button class="info-circle text-[9px]" onclick="openModal('alpha')" title="Machine α">i</button>
         </div>
+        <div class="flex-1 timeline-16-cols track-height bg-slate-950/80 rounded border border-slate-800 relative" data-machine="3"></div>
       </div>
     </section>
 
-    <!-- Interactive Concept Lenses -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <!-- Lens A: KPIs & Feasibility -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            KPIs & Violations
-            <button class="info-btn" onclick="openConcept('cmax')" title="Makespan">i</button>
-          </h3>
-          <span id="badge-status" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">FEASIBLE</span>
+    <!-- Schedule Status Badge & Violations -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div class="flex items-center gap-3">
+        <span class="text-slate-400 uppercase text-[11px]">Current Makespan ($C_{\max}$):</span>
+        <span id="kpi-cmax-val" class="text-xl font-bold text-sky-400">10</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="kpi-status-badge" class="px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">FEASIBLE</span>
+      </div>
+      <div id="kpi-violations-summary" class="w-full text-slate-400 text-[11px] pt-1 border-t border-slate-800">
+        ✓ Feasible schedule.
+      </div>
+    </div>
+
+    <!-- THE THREE EXTENSION TABS (Big-M, Maintenance, Dairy) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+      <!-- Tab Header Buttons -->
+      <div class="flex border-b border-slate-800 bg-slate-950/60 text-xs font-medium">
+        <button id="tab-btn-bigm" class="px-4 py-2.5 border-b-2 border-sky-400 text-sky-300 bg-slate-900 flex items-center gap-1.5" onclick="selectTab('bigm')">
+          <span>Lens 1: Big-M & Disjunctive Formulation</span>
+          <span class="info-circle" onclick="event.stopPropagation(); openModal('bigm')">i</span>
+        </button>
+        <button id="tab-btn-maint" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5" onclick="selectTab('maint')">
+          <span>Lens 2: Maintenance (1b.i)</span>
+          <span class="info-circle" onclick="event.stopPropagation(); openModal('maintenance')">i</span>
+        </button>
+        <button id="tab-btn-dairy" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5" onclick="selectTab('dairy')">
+          <span>Lens 3: Dairy JIT Penalties (1b.ii)</span>
+          <span class="info-circle" onclick="event.stopPropagation(); openModal('dairy')">i</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Big-M & Disjunctive Logic -->
+      <div id="tab-content-bigm" class="p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-xs text-slate-400 max-w-2xl">
+            Inspect how the disjunctive binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and the Big-M parameter enforce that two jobs cannot be processed simultaneously on machine $\alpha$[cite: 3].
+          </p>
+          <div class="flex items-center gap-3 bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-xs">
+            <label class="text-slate-400 font-mono">Parameter $\text{bigM}$:</label>
+            <input type="range" id="bigm-slider" min="5" max="30" value="15" class="w-24 cursor-pointer accent-sky-500" />
+            <span id="bigm-slider-val" class="font-mono font-bold text-sky-400">15</span>
+          </div>
         </div>
-        <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-800/80">
-          <div class="text-[11px] text-slate-400">Current Makespan ($C_{\max}$)</div>
-          <div id="val-cmax" class="text-3xl font-mono font-bold text-sky-400 mt-0.5">10</div>
-        </div>
-        <div id="violations-container" class="text-xs font-mono space-y-1.5 min-h-[60px] text-slate-300">
-          <!-- Live violation messages -->
+
+        <!-- Big-M Evaluation Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono" id="bigm-equations-cards">
+          <!-- Dynamically populated per machine -->
         </div>
       </div>
 
-      <!-- Lens B: Problem 1(b.i) Maintenance -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            1(b.i) Maintenance Task
-            <button class="info-btn" onclick="openConcept('maintenance')" title="Maintenance Constraint">i</button>
-          </h3>
-          <input type="checkbox" id="maint-enable" class="w-4 h-4 rounded text-sky-600 focus:ring-0 cursor-pointer" />
-        </div>
-        <p class="text-xs text-slate-400">Enforce machine $\alpha^*$ shutdown at time $t^*$</p>
-        <div class="grid grid-cols-2 gap-3 text-xs">
+      <!-- Tab 2: Maintenance Task (1b.i) -->
+      <div id="tab-content-maint" class="p-5 space-y-4 hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <label class="block text-slate-400 text-[11px] mb-1">Target Machine ($\alpha^*$)</label>
-            <select id="maint-machine" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 font-mono text-slate-200">
+            <h3 class="text-sm font-semibold text-slate-200">Problem 1(b.i): Machine Shutdown Constraint</h3>
+            <p class="text-xs text-slate-400 mt-0.5">A preventive maintenance window requires machine $\alpha^*$ to be fully clear by time $t^*$[cite: 3].</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-300 font-semibold cursor-pointer" for="maint-active-check">Enable Maintenance Window:</label>
+            <input type="checkbox" id="maint-active-check" class="w-4 h-4 rounded text-sky-600 cursor-pointer" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-2">
+            <label class="block text-slate-400 font-mono">Target Machine ($\alpha^*$):</label>
+            <select id="maint-target-mach" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 font-mono text-slate-200">
               <option value="1">M1</option>
               <option value="2">M2</option>
               <option value="3" selected>M3</option>
             </select>
           </div>
-          <div>
-            <label class="block text-slate-400 text-[11px] mb-1">Deadline ($t^*$)</label>
-            <input type="number" id="maint-time" min="1" max="15" value="11" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 font-mono text-slate-200" />
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-2">
+            <label class="block text-slate-400 font-mono">Deadline Time ($t^*$):</label>
+            <input type="number" id="maint-target-deadline" min="1" max="15" value="11" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 font-mono text-slate-200" />
           </div>
-        </div>
-        <div id="maint-math" class="p-2.5 bg-slate-950 rounded border border-slate-800 text-[11px] font-mono text-slate-300">
-          $X_{j\alpha^*} + p_{j\alpha^*} \le t^*$
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
+            <span class="block text-slate-400 text-[11px] uppercase font-bold tracking-wider">Formulation:</span>
+            <div class="text-slate-300 font-mono text-xs pt-1">$X_{j\alpha^*} + p_{j\alpha^*} \le t^* \quad \forall j$</div>
+          </div>
         </div>
       </div>
 
-      <!-- Lens C: Problem 1(b.ii) Dairy JIT Penalties -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            1(b.ii) Perishable Dairy Cost
-            <button class="info-btn" onclick="openConcept('dairy')" title="Earliness & Tardiness">i</button>
-          </h3>
-          <span id="val-dairy-cost" class="text-sm font-mono font-bold text-amber-400">0.00 €</span>
-        </div>
-        <p class="text-xs text-slate-400">Earliness ($q_j$) holding vs. tardiness ($u_j$) penalty</p>
-        <div class="grid grid-cols-2 gap-3 text-[11px] font-mono">
-          <div class="p-2 bg-slate-950 rounded border border-slate-800">
-            <span class="text-sky-400 font-bold block mb-1">Job 1 ($d_1=8$)</span>
-            <div>Earliness $E_1$: <span id="e1-val">0</span></div>
-            <div>Tardiness $T_1$: <span id="t1-val">0</span></div>
+      <!-- Tab 3: Dairy Perishable JIT Cost (1b.ii) -->
+      <div id="tab-content-dairy" class="p-5 space-y-4 hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-200">Problem 1(b.ii): Perishable Dairy Costs</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Earliness incurs cooling storage costs ($q_j$), while tardiness incurs late penalties ($u_j$)[cite: 4].</p>
           </div>
-          <div class="p-2 bg-slate-950 rounded border border-slate-800">
-            <span class="text-amber-400 font-bold block mb-1">Job 2 ($d_2=10$)</span>
-            <div>Earliness $E_2$: <span id="e2-val">0</span></div>
-            <div>Tardiness $T_2$: <span id="t2-val">0</span></div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Total Penalty Cost:</span>
+            <span id="dairy-total-cost" class="text-xl font-bold font-mono text-amber-400">0.00 €</span>
           </div>
         </div>
-        <div class="text-[10px] text-slate-500 font-mono">
-          Objective: $\min \sum_j (q_j E_j + u_j T_j)$
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1.5">
+            <span class="text-sky-400 font-bold block">Job 1 (Due date $d_1 = 8$)</span>
+            <div>Completion $C_1$: <span id="dairy-c1" class="text-white">8</span></div>
+            <div>Earliness $E_1 = \max(0, 8 - C_1)$: <span id="dairy-e1" class="text-slate-300">0</span> &times; 2€ = <span id="dairy-e1-cost" class="text-amber-300">0€</span></div>
+            <div>Tardiness $T_1 = \max(0, C_1 - 8)$: <span id="dairy-t1" class="text-slate-300">0</span> &times; 5€ = <span id="dairy-t1-cost" class="text-rose-300">0€</span></div>
+          </div>
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1.5">
+            <span class="text-amber-400 font-bold block">Job 2 (Due date $d_2 = 10$)</span>
+            <div>Completion $C_2$: <span id="dairy-c2" class="text-white">10</span></div>
+            <div>Earliness $E_2 = \max(0, 10 - C_2)$: <span id="dairy-e2" class="text-slate-300">0</span> &times; 3€ = <span id="dairy-e2-cost" class="text-amber-300">0€</span></div>
+            <div>Tardiness $T_2 = \max(0, C_2 - 10)$: <span id="dairy-t2" class="text-slate-300">0</span> &times; 6€ = <span id="dairy-t2-cost" class="text-rose-300">0€</span></div>
+          </div>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Modal for (i) Concept Descriptions -->
+  <!-- Interactive (i) Explanatory Modal -->
   <div id="concept-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-lg w-full rounded-2xl p-6 shadow-2xl relative space-y-3">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 id="modal-title" class="text-base font-bold text-sky-400">Concept Explanation</h3>
-        <button onclick="closeConcept()" class="text-slate-400 hover:text-white text-xl font-mono leading-none">&times;</button>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl font-mono leading-none">&times;</button>
       </div>
-      <div id="modal-content" class="text-xs text-slate-300 space-y-2 leading-relaxed">
-        <!-- Concept text & KaTeX dynamically rendered -->
-      </div>
+      <div id="modal-content" class="text-xs text-slate-300 space-y-2 leading-relaxed"></div>
       <div class="text-right pt-2 border-t border-slate-800/80">
-        <button onclick="closeConcept()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-200">Close</button>
+        <button onclick="closeModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold text-slate-200">Close</button>
       </div>
     </div>
   </div>
@@ -256,7 +289,6 @@
         rel="noopener noreferrer" 
         class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0077B5] hover:bg-[#006097] text-white rounded font-medium text-xs shadow-md transition"
       >
-        <!-- Official LinkedIn SVG Icon -->
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
           <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
         </svg>
@@ -267,7 +299,7 @@
 
   <!-- Application Logic -->
   <script>
-    // Data definition from Exercise 5[cite: 2]
+    // Exact Problem 1 parameters[cite: 2]
     const ops = {
       j1_m3: { job: 1, machine: 3, p: 4, start: 0, label: 'J1 on M3 (p=4)' },
       j1_m2: { job: 1, machine: 2, p: 2, start: 4, label: 'J1 on M2 (p=2)' },
@@ -278,39 +310,45 @@
     };
 
     let selectedOp = 'j1_m3';
+    let currentTab = 'bigm';
 
-    // Concept definitions for (i) buttons directly from course concepts
+    // Concept content for (i) buttons
     const concepts = {
       jobshop: {
         title: "Job Shop Scheduling (JSS)",
-        html: `<p>A scheduling environment where multiple jobs visit multiple machines in predefined technological routes.</p>
-               <p>Key assumptions: each job visits machines in a strict order; no preemption; machines process at most one job at a time.</p>`
+        html: `<p>A scheduling model where multiple jobs visit multiple machines in specific predetermined technological routes.</p>
+               <p>Key assumptions: each operation requires exclusive machine capacity; operations cannot be preempted; start times must honor machine sequencing and precedence.</p>`
       },
       cmax: {
         title: "Makespan ($C_{\\max}$)",
-        html: `<p><b>Makespan</b> is the total completion time of the last job leaving the system: $$C_{\\max} = \\max_{j} C_j$$</p>
-               <p>Minimizing makespan maximizes machine throughput and workshop utilization. In MIP, it is bounded by: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$[cite: 3]</p>`
+        html: `<p><b>Makespan</b> is the completion time of the last job leaving the system: $$C_{\\max} = \\max_j C_j$$</p>
+               <p>Minimizing makespan maximizes machine throughput. In MIP, it is enforced via: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$[cite: 3]</p>`
       },
       alpha: {
-        title: "Machine Index ($\\alpha, \\bar{\\alpha}$)",
-        html: `<p>$\\alpha$ denotes the current machine, and $\\bar{\\alpha}$ denotes the immediate successor machine along job $j$'s routing path[cite: 2, 3].</p>
-               <p>The parameter $a_{j\\alpha\\bar{\\alpha}} = 1$ indicates that job $j$ visits machine $\\alpha$ directly before $\\bar{\\alpha}$[cite: 3].</p>`
+        title: "Machine Indices ($\\alpha, \\bar{\\alpha}$)",
+        html: `<p>$\\alpha$ denotes the current machine, and $\\bar{\\alpha}$ denotes the immediate successor machine along job $j$'s route[cite: 2, 3]. The parameter $a_{j\\alpha\\bar{\\alpha}} = 1$ enforces that job $j$ visits machine $\\alpha$ directly before $\\bar{\\alpha}$[cite: 3].</p>`
       },
       precedence: {
         title: "Technological Precedence Constraints",
-        html: `<p>An operation cannot begin until the preceding operation of the same job is completely finished[cite: 3]:</p>
+        html: `<p>An operation cannot begin until its predecessor operation for the same job completes[cite: 3]:</p>
                <p>$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall a_{j\\alpha\\bar{\\alpha}} = 1$$[cite: 3]</p>`
       },
+      bigm: {
+        title: "Big-M Disjunctive Formulation",
+        html: `<p>Prevents jobs $i$ and $j$ from overlapping on machine $\\alpha$[cite: 3]:</p>
+               <p>$$X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha} + (Y_{ij}^\\alpha - 1) \\cdot \\text{bigM}$$[cite: 3]</p>
+               <p>If $Y_{ij}^\\alpha = 1$, job $i$ precedes $j$ ($X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha}$)[cite: 3]. If $Y_{ij}^\\alpha = 0$, the constraint is relaxed by $-\\text{bigM}$[cite: 3].</p>`
+      },
       maintenance: {
-        title: "1(b.i) Preventive Maintenance Window",
-        html: `<p>When machine $\\alpha^*$ must undergo maintenance starting at $t^*$, all operations scheduled on that machine must complete no later than $t^*$[cite: 3]:</p>
+        title: "1(b.i) Preventive Maintenance Task",
+        html: `<p>To allow sufficient time for maintenance starting at $t^*$ on machine $\\alpha^*$, every operation on $\\alpha^*$ must finish no later than $t^*$[cite: 3]:</p>
                <p>$$X_{j\\alpha^*} + p_{j\\alpha^*} \\le t^* \\quad \\forall j \\in \\{1,\\dots,J\\}$$[cite: 3]</p>`
       },
       dairy: {
-        title: "1(b.ii) Earliness & Tardiness in Perishable Production",
-        html: `<p>In dairy processing, finishing earlier than due date $d_j$ incurs refrigeration storage costs ($q_j$), while finishing late incurs penalties ($u_j$)[cite: 4]:</p>
+        title: "1(b.ii) Earliness & Tardiness (Dairy Perishables)",
+        html: `<p>Perishable products require cooling storage if finished early ($E_j$), or trigger penalties if finished late ($T_j$)[cite: 4]:</p>
                <p>$$C_j - d_j = T_j - E_j, \\quad E_j \\ge 0, \\; T_j \\ge 0$$</p>
-               <p>Objective shifts to: $$\\min \\sum_{j=1}^J (q_j E_j + u_j T_j)$$[cite: 4]</p>`
+               <p>Objective: $$\\min \\sum_{j=1}^J (q_j E_j + u_j T_j)$$[cite: 4]</p>`
       }
     };
 
@@ -326,47 +364,58 @@
       }
     }
 
-    function openConcept(key) {
+    function openModal(key) {
       const data = concepts[key];
       if (!data) return;
       document.getElementById('modal-title').textContent = data.title;
-      const contentEl = document.getElementById('modal-content');
-      contentEl.innerHTML = data.html;
+      const el = document.getElementById('modal-content');
+      el.innerHTML = data.html;
       document.getElementById('concept-modal').classList.remove('hidden');
-      if (window.renderMathInElement) renderMathInElement(contentEl, { throwOnError: false });
+      if (window.renderMathInElement) renderMathInElement(el, { throwOnError: false });
     }
 
-    function closeConcept() {
+    function closeModal() {
       document.getElementById('concept-modal').classList.add('hidden');
     }
 
-    document.getElementById('concept-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'concept-modal') closeConcept();
-    });
+    function selectTab(tab) {
+      currentTab = tab;
+      ['bigm', 'maint', 'dairy'].forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        if (t === tab) {
+          btn.className = "px-4 py-2.5 border-b-2 border-sky-400 text-sky-300 bg-slate-900 flex items-center gap-1.5";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5";
+          content.classList.add('hidden');
+        }
+      });
+      render();
+    }
 
-    // Populate buttons
-    function createOpButtons() {
-      const group = document.getElementById('op-btn-group');
-      group.innerHTML = '';
+    function buildPills() {
+      const container = document.getElementById('op-pills-container');
+      container.innerHTML = '';
       Object.entries(ops).forEach(([key, op]) => {
         const btn = document.createElement('button');
-        btn.id = `btn-${key}`;
-        btn.className = `px-2.5 py-1 rounded-lg text-xs font-mono font-medium border transition ${
+        btn.id = `pill-${key}`;
+        btn.className = `px-2.5 py-1 rounded text-xs font-mono font-medium border transition ${
           op.job === 1 ? 'border-sky-500/40 text-sky-300' : 'border-amber-500/40 text-amber-300'
         }`;
         btn.textContent = op.label;
         btn.onclick = () => {
           selectedOp = key;
-          updateActiveSelection();
+          highlightPills();
         };
-        group.appendChild(btn);
+        container.appendChild(btn);
       });
-      updateActiveSelection();
+      highlightPills();
     }
 
-    function updateActiveSelection() {
+    function highlightPills() {
       Object.keys(ops).forEach(key => {
-        const btn = document.getElementById(`btn-${key}`);
+        const btn = document.getElementById(`pill-${key}`);
         if (!btn) return;
         if (key === selectedOp) {
           btn.classList.add('ring-2', 'ring-white', 'bg-slate-800');
@@ -377,38 +426,34 @@
       render();
     }
 
-    // Step operations forward/backward
-    document.getElementById('step-minus').onclick = () => {
+    document.getElementById('nudge-minus').onclick = () => {
       if (ops[selectedOp].start > 0) {
         ops[selectedOp].start--;
         render();
       }
     };
-    document.getElementById('step-plus').onclick = () => {
+    document.getElementById('nudge-plus').onclick = () => {
       if (ops[selectedOp].start + ops[selectedOp].p < 16) {
         ops[selectedOp].start++;
         render();
       }
     };
 
-    // Render Gantt Chart
     function render() {
+      const isMaint = document.getElementById('maint-active-check').checked;
+      const maintM = parseInt(document.getElementById('maint-target-mach').value);
+      const maintT = parseInt(document.getElementById('maint-target-deadline').value);
+
       [1, 2, 3].forEach(m => {
         const track = document.querySelector(`[data-machine="${m}"]`);
         track.innerHTML = '';
 
-        // Check maintenance zone[cite: 3]
-        const isMaint = document.getElementById('maint-enable').checked;
-        const maintM = parseInt(document.getElementById('maint-machine').value);
-        const maintT = parseInt(document.getElementById('maint-time').value);
-
-        // Render 16 background interactive cells
+        // 16 clickable discrete grid columns
         for (let t = 0; t < 16; t++) {
           const cell = document.createElement('div');
-          const inMaintZone = isMaint && (m === maintM) && (t >= maintT);
-          
+          const isBlocked = isMaint && (m === maintM) && (t >= maintT);
           cell.className = `border-r border-slate-800/40 cursor-pointer transition ${
-            inMaintZone ? 'maintenance-zone' : 'hover:bg-slate-800/40'
+            isBlocked ? 'maint-striped' : 'hover:bg-slate-800/40'
           }`;
           cell.onclick = () => {
             if (ops[selectedOp].machine === m) {
@@ -419,21 +464,20 @@
           track.appendChild(cell);
         }
 
-        // Render placed task blocks using CSS Grid span
+        // Overlay placed operations using CSS grid column span
         Object.entries(ops).forEach(([key, op]) => {
           if (op.machine === m) {
             const block = document.createElement('div');
             const isSelected = selectedOp === key;
             const isJ1 = op.job === 1;
 
-            // Grid column placement: start + 1 because CSS grid is 1-indexed
             block.style.gridColumn = `${op.start + 1} / span ${op.p}`;
             block.style.position = 'relative';
-            block.style.margin = '4px 2px';
+            block.style.margin = '4px 1px';
             block.style.zIndex = '10';
 
             block.className = `rounded flex items-center justify-between px-2 text-[11px] font-mono font-bold cursor-pointer select-none transition ${
-              isJ1 ? 'bg-sky-600/95 text-sky-50 border border-sky-400' : 'bg-amber-600/95 text-amber-50 border border-amber-400'
+              isJ1 ? 'bg-sky-600/90 text-sky-50 border border-sky-400' : 'bg-amber-600/90 text-amber-50 border border-amber-400'
             } ${isSelected ? 'ring-2 ring-white shadow-lg' : 'opacity-90 hover:opacity-100'}`;
 
             block.innerHTML = `
@@ -444,7 +488,7 @@
             block.onclick = (e) => {
               e.stopPropagation();
               selectedOp = key;
-              updateActiveSelection();
+              highlightPills();
             };
 
             track.appendChild(block);
@@ -452,76 +496,71 @@
         });
       });
 
-      evaluateConstraints();
+      evaluate();
     }
 
-    function evaluateConstraints() {
+    function evaluate() {
       const violations = [];
       let cMax = 0;
 
-      // Makespan calculation[cite: 3]
       Object.values(ops).forEach(op => {
         cMax = Math.max(cMax, op.start + op.p);
       });
-      document.getElementById('val-cmax').textContent = cMax;
+      document.getElementById('kpi-cmax-val').textContent = cMax;
 
-      // Precedence relations[cite: 2, 3]
-      // Job 1: M3 -> M2 -> M1[cite: 2]
+      // Precedence checks[cite: 2, 3]
       if (ops.j1_m2.start < ops.j1_m3.start + ops.j1_m3.p) {
-        violations.push(`Job 1 precedence: M2 starts (t=${ops.j1_m2.start}) before M3 finishes (t=${ops.j1_m3.start + ops.j1_m3.p})`);
+        violations.push(`J1 precedence: M2 starts before M3 completes.`);
       }
       if (ops.j1_m1.start < ops.j1_m2.start + ops.j1_m2.p) {
-        violations.push(`Job 1 precedence: M1 starts (t=${ops.j1_m1.start}) before M2 finishes (t=${ops.j1_m2.start + ops.j1_m2.p})`);
+        violations.push(`J1 precedence: M1 starts before M2 completes.`);
       }
-
-      // Job 2: M2 -> M1 -> M3[cite: 2]
       if (ops.j2_m1.start < ops.j2_m2.start + ops.j2_m2.p) {
-        violations.push(`Job 2 precedence: M1 starts (t=${ops.j2_m1.start}) before M2 finishes (t=${ops.j2_m2.start + ops.j2_m2.p})`);
+        violations.push(`J2 precedence: M1 starts before M2 completes.`);
       }
       if (ops.j2_m3.start < ops.j2_m1.start + ops.j2_m1.p) {
-        violations.push(`Job 2 precedence: M3 starts (t=${ops.j2_m3.start}) before M1 finishes (t=${ops.j2_m1.start + ops.j2_m1.p})`);
+        violations.push(`J2 precedence: M3 starts before M1 completes.`);
       }
 
-      // Machine overlap checks[cite: 3]
-      const checkMachine = (m, a, b) => {
+      // Overlaps[cite: 3]
+      const checkOverlap = (m, a, b) => {
         if (Math.max(a.start, b.start) < Math.min(a.start + a.p, b.start + b.p)) {
-          violations.push(`Machine conflict on M${m}: J1 and J2 overlap between t=${Math.max(a.start, b.start)} and t=${Math.min(a.start + a.p, b.start + b.p)}`);
+          violations.push(`Machine conflict on M${m}: J1 and J2 overlap.`);
         }
       };
-      checkMachine(1, ops.j1_m1, ops.j2_m1);
-      checkMachine(2, ops.j1_m2, ops.j2_m2);
-      checkMachine(3, ops.j1_m3, ops.j2_m3);
+      checkOverlap(1, ops.j1_m1, ops.j2_m1);
+      checkOverlap(2, ops.j1_m2, ops.j2_m2);
+      checkOverlap(3, ops.j1_m3, ops.j2_m3);
 
-      // Maintenance task check (1b.i)[cite: 3]
-      const isMaint = document.getElementById('maint-enable').checked;
-      const maintM = parseInt(document.getElementById('maint-machine').value);
-      const maintT = parseInt(document.getElementById('maint-time').value);
+      // Maintenance (1b.i)[cite: 3]
+      const isMaint = document.getElementById('maint-active-check').checked;
+      const maintM = parseInt(document.getElementById('maint-target-mach').value);
+      const maintT = parseInt(document.getElementById('maint-target-deadline').value);
 
       if (isMaint) {
         Object.values(ops).forEach(op => {
           if (op.machine === maintM && (op.start + op.p) > maintT) {
-            violations.push(`Maintenance violation on M${maintM}: J${op.job} finishes at t=${op.start + op.p} > deadline t*=${maintT}`);
+            violations.push(`Maintenance violation on M${maintM}: finishes at t=${op.start + op.p} > deadline ${maintT}.`);
           }
         });
       }
 
-      // Update badge & list
-      const badge = document.getElementById('badge-status');
-      const list = document.getElementById('violations-container');
+      const badge = document.getElementById('kpi-status-badge');
+      const summary = document.getElementById('kpi-violations-summary');
 
       if (violations.length === 0) {
-        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        badge.className = "px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
         badge.textContent = "FEASIBLE";
-        list.innerHTML = `<span class="text-emerald-400 font-semibold">&check; All technological precedence and machine capacities satisfied.</span>`;
+        summary.innerHTML = `<span class="text-emerald-400 font-semibold">✓ Feasible schedule. All precedence and machine exclusion constraints satisfied.</span>`;
       } else {
-        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
+        badge.className = "px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
         badge.textContent = "INFEASIBLE";
-        list.innerHTML = violations.map(v => `<div class="text-rose-400">&cross; ${v}</div>`).join('');
+        summary.innerHTML = violations.map(v => `<div class="text-rose-400">✕ ${v}</div>`).join('');
       }
 
       // Dairy cost evaluation (1b.ii)[cite: 4]
-      const c1 = ops.j1_m1.start + ops.j1_m1.p; // last op of J1 is on M1[cite: 2]
-      const c2 = ops.j2_m3.start + ops.j2_m3.p; // last op of J2 is on M3[cite: 2]
+      const c1 = ops.j1_m1.start + ops.j1_m1.p;
+      const c2 = ops.j2_m3.start + ops.j2_m3.p;
       const d1 = 8, d2 = 10;
       const q1 = 2, u1 = 5;
       const q2 = 3, u2 = 6;
@@ -529,13 +568,60 @@
       const e1 = Math.max(0, d1 - c1), t1 = Math.max(0, c1 - d1);
       const e2 = Math.max(0, d2 - c2), t2 = Math.max(0, c2 - d2);
 
-      document.getElementById('e1-val').textContent = `${e1} (${e1 * q1}€)`;
-      document.getElementById('t1-val').textContent = `${t1} (${t1 * u1}€)`;
-      document.getElementById('e2-val').textContent = `${e2} (${e2 * q2}€)`;
-      document.getElementById('t2-val').textContent = `${t2} (${t2 * u2}€)`;
+      document.getElementById('dairy-c1').textContent = c1;
+      document.getElementById('dairy-e1').textContent = e1;
+      document.getElementById('dairy-t1').textContent = t1;
+      document.getElementById('dairy-e1-cost').textContent = `${e1 * q1}€`;
+      document.getElementById('dairy-t1-cost').textContent = `${t1 * u1}€`;
+
+      document.getElementById('dairy-c2').textContent = c2;
+      document.getElementById('dairy-e2').textContent = e2;
+      document.getElementById('dairy-t2').textContent = t2;
+      document.getElementById('dairy-e2-cost').textContent = `${e2 * q2}€`;
+      document.getElementById('dairy-t2-cost').textContent = `${t2 * u2}€`;
 
       const totalCost = (e1 * q1) + (t1 * u1) + (e2 * q2) + (t2 * u2);
-      document.getElementById('val-dairy-cost').textContent = `${totalCost.toFixed(2)} €`;
+      document.getElementById('dairy-total-cost').textContent = `${totalCost.toFixed(2)} €`;
+
+      // Update Big-M calculations card[cite: 3]
+      updateBigMEvaluations();
+    }
+
+    function updateBigMEvaluations() {
+      const container = document.getElementById('bigm-equations-cards');
+      if (!container) return;
+      const bigM = parseInt(document.getElementById('bigm-slider').value);
+
+      const pairs = [
+        { m: 1, op1: ops.j1_m1, op2: ops.j2_m1 },
+        { m: 2, op1: ops.j1_m2, op2: ops.j2_m2 },
+        { m: 3, op1: ops.j1_m3, op2: ops.j2_m3 }
+      ];
+
+      container.innerHTML = pairs.map(({ m, op1, op2 }) => {
+        // Y_12 = 1 means J1 precedes J2[cite: 3]
+        const y12 = op1.start + op1.p <= op2.start ? 1 : 0;
+        const y21 = 1 - y12;
+
+        const bound12 = op1.start + op1.p + (y12 - 1) * bigM;
+        const bound21 = op2.start + op2.p + (y21 - 1) * bigM;
+
+        return `
+          <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-2">
+            <div class="text-sky-400 font-bold border-b border-slate-800 pb-1">Machine M${m}</div>
+            <div>Decided ordering: <span class="text-white font-bold">${y12 === 1 ? 'J1 &rarr; J2' : 'J2 &rarr; J1'}</span></div>
+            <div class="text-[11px] text-slate-400 space-y-1">
+              <div>$Y_{12}^{${m}} = ${y12}$, $Y_{21}^{${m}} = ${y21}$</div>
+              <div>$X_{2,${m}} (${op2.start}) \\ge ${bound12}$ ${op2.start >= bound12 ? '<span class="text-emerald-400">✓</span>' : '<span class="text-rose-400">✕</span>'}</div>
+              <div>$X_{1,${m}} (${op1.start}) \\ge ${bound21}$ ${op1.start >= bound21 ? '<span class="text-emerald-400">✓</span>' : '<span class="text-rose-400">✕</span>'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.renderMathInElement) {
+        renderMathInElement(container, { throwOnError: false });
+      }
     }
 
     // Presets
@@ -551,12 +637,17 @@
       render();
     };
 
-    document.getElementById('maint-enable').onchange = render;
-    document.getElementById('maint-machine').onchange = render;
-    document.getElementById('maint-time').oninput = render;
+    document.getElementById('bigm-slider').oninput = (e) => {
+      document.getElementById('bigm-slider-val').textContent = e.target.value;
+      updateBigMEvaluations();
+    };
 
-    // Initialization
-    createOpButtons();
+    document.getElementById('maint-active-check').onchange = render;
+    document.getElementById('maint-target-mach').onchange = render;
+    document.getElementById('maint-target-deadline').oninput = render;
+
+    // Initialize
+    buildPills();
     render();
   </script>
 </body>
