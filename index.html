@@ -184,7 +184,7 @@
       <div id="tab-content-bigm" class="p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <p class="text-xs text-slate-400 max-w-2xl">
-            Inspect how the disjunctive binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and the Big-M parameter enforce that two jobs cannot be processed simultaneously on machine $\alpha$.[cite: 3]
+            Inspect how the disjunctive binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and the Big-M parameter enforce that two jobs cannot be processed simultaneously on machine $\alpha$.
           </p>
           <div class="flex items-center gap-3 bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-xs">
             <label class="text-slate-400 font-mono">Parameter $\text{bigM}$:</label>
@@ -204,7 +204,7 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-200">Problem 1(b.i): Machine Shutdown Constraint</h3>
-            <p class="text-xs text-slate-400 mt-0.5">A preventive maintenance window requires machine $\alpha^*$ to be fully clear by time $t^*$.[cite: 3]</p>
+            <p class="text-xs text-slate-400 mt-0.5">A preventive maintenance window requires machine $\alpha^*$ to be fully clear by time $t^*$.</p>
           </div>
           <div class="flex items-center gap-2">
             <label class="text-xs text-slate-300 font-semibold cursor-pointer" for="maint-active-check">Enable Maintenance Window:</label>
@@ -237,7 +237,7 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-200">Problem 1(b.ii): Perishable Dairy Factory Sandbox</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Customize due dates and penalty rates to inspect the earliness vs. tardiness cost trade-off.[cite: 4]</p>
+            <p class="text-xs text-slate-400 mt-0.5">Customize due dates and penalty rates to inspect the earliness vs. tardiness cost trade-off.</p>
           </div>
           <div class="text-right">
             <span class="text-xs text-slate-400 block">Total Penalty Cost:</span>
@@ -365,7 +365,7 @@
         title: "Makespan ($C_{\\max}$)",
         html: `<p><b>Makespan</b> is defined as the time the last job finishes and leaves the production system: $$C_{\\max} = \\max(C_1, C_2, \\dots, C_n)$$</p>
                <p>Minimizing makespan maximizes machine throughput and resource utilization.</p>
-               <p>In MIP optimization, it is linearized with bounding constraints over all jobs $j$ and machines $\\alpha$: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$</p>`
+               <p>In Mixed Integer Programming (MIP), it is linearized with bounding constraints over all jobs $j$ and machines $\\alpha$: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$</p>`
       },
       alpha: {
         title: "Machine Indices ($\\alpha, \\bar{\\alpha}$)",
@@ -414,7 +414,15 @@
       const el = document.getElementById('modal-content');
       el.innerHTML = data.html;
       document.getElementById('concept-modal').classList.remove('hidden');
-      if (window.renderMathInElement) renderMathInElement(el, { throwOnError: false });
+      if (window.renderMathInElement) {
+        renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
     }
 
     function closeModal() {
@@ -651,6 +659,7 @@
       ];
 
       container.innerHTML = pairs.map(({ m, op1, op2 }) => {
+        // Y_12 = 1 indicates Job 1 precedes Job 2 on machine m[cite: 3]
         const y12 = op1.start + op1.p <= op2.start ? 1 : 0;
         const y21 = 1 - y12;
 
@@ -663,20 +672,27 @@
             <div>Decided ordering: <span class="text-white font-bold">${y12 === 1 ? 'J1 &rarr; J2' : 'J2 &rarr; J1'}</span></div>
             <div class="text-[11px] text-slate-400 space-y-1">
               <div>$Y_{12}^{${m}} = ${y12}$, $Y_{21}^{${m}} = ${y21}$</div>
-              <div>$X_{2,${m}} (${op2.start}) \\ge ${bound12}$ ${op2.start >= bound12 ? '<span class="text-emerald-400">✓</span>' : '<span class="text-rose-400">✕</span>'}</div>
-              <div>$X_{1,${m}} (${op1.start}) \\ge ${bound21}$ ${op1.start >= bound21 ? '<span class="text-emerald-400">✓</span>' : '<span class="text-rose-400">✕</span>'}</div>
+              <div>$X_{2,${m}} (${op2.start}) \\ge ${bound12}$ ${op2.start >= bound12 ? '<span class="text-emerald-400 font-bold">&check;</span>' : '<span class="text-rose-400 font-bold">&cross;</span>'}</div>
+              <div>$X_{1,${m}} (${op1.start}) \\ge ${bound21}$ ${op1.start >= bound21 ? '<span class="text-emerald-400 font-bold">&check;</span>' : '<span class="text-rose-400 font-bold">&cross;</span>'}</div>
             </div>
           </div>
         `;
       }).join('');
 
       if (window.renderMathInElement) {
-        renderMathInElement(container, { throwOnError: false });
+        renderMathInElement(container, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
       }
     }
 
     // Presets
     document.getElementById('btn-solution').onclick = () => {
+      // Optimal Exercise 5 solution[cite: 2]
       ops.j1_m3.start = 0; ops.j1_m2.start = 4; ops.j1_m1.start = 7;
       ops.j2_m2.start = 0; ops.j2_m1.start = 3; ops.j2_m3.start = 5;
       render();
