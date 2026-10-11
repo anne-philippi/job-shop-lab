@@ -254,16 +254,16 @@
       <div id="tab-content-dairy" class="p-5 space-y-4 hidden">
         <!-- Exercise Prompt Banner -->
         <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
-          <span class="font-bold text-emerald-800">Question:</span> Consider job shop scheduling in a dairy factory with perishable products[cite: 15]. Each job $j$ has a due date $d_j$, earliness storage cost $q_j$ per unit, and tardiness penalty $u_j$ per unit[cite: 15]. Change the model to minimize total costs related to earliness and tardiness[cite: 15].
+          <span class="font-bold text-emerald-800">Question:</span> Consider job shop scheduling in a dairy factory with perishable products. Each job $j$ has a due date $d_j$, earliness storage cost $q_j$ per unit, and tardiness penalty $u_j$ per unit. Change the model to minimize total costs related to earliness and tardiness.
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Problem 1(b.ii): Perishable Dairy Factory Sandbox</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Minimize total earliness &amp; tardiness costs using completion time on last machine $l_j$[cite: 17].</p>
+            <p class="text-xs text-slate-500 mt-0.5">Minimize total earliness &amp; tardiness costs using completion time on last machine $l_j$.</p>
           </div>
           <div class="text-right">
-            <span class="text-xs text-slate-500 block">Objective Function $\min \sum_{j=1}^{J} (E_j \cdot q_j + T_j \cdot u_j)$[cite: 17]:</span>
+            <span class="text-xs text-slate-500 block">Objective Function $\min \sum_{j=1}^{J} (E_j \cdot q_j + T_j \cdot u_j)$:</span>
             <span id="dairy-total-cost" class="text-2xl font-bold font-mono text-amber-600">0.00 €</span>
           </div>
         </div>
@@ -275,15 +275,15 @@
             </div>
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_1$)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_1$)</label>
                 <input type="number" id="input-d1" min="1" max="20" step="1" value="8" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)</label>
                 <input type="number" id="input-q1" min="0" max="100" step="0.5" value="2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)</label>
                 <input type="number" id="input-u1" min="0" max="100" step="0.5" value="5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
@@ -299,15 +299,15 @@
             </div>
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_2$)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_2$)</label>
                 <input type="number" id="input-d2" min="1" max="20" step="1" value="10" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)</label>
                 <input type="number" id="input-q2" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)[cite: 15]</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)</label>
                 <input type="number" id="input-u2" min="0" max="100" step="0.5" value="6" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
@@ -323,7 +323,7 @@
       <div id="tab-content-tardiness" class="p-5 space-y-4 hidden">
         <!-- Exercise Prompt Banner -->
         <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
-          <span class="font-bold text-emerald-800">Question:</span> Formulate alternative objective functions and necessary extra constraints for: (1) Minimizing maximum tardiness $T_{\max}$[cite: 18], (2) Minimizing average tardiness[cite: 19], and (3) Minimizing the number of tardy jobs $\sum U_j$[cite: 20].
+          <span class="font-bold text-emerald-800">Question:</span> Formulate alternative objective functions and necessary extra constraints for: (1) Minimizing maximum tardiness $T_{\max}$, (2) Minimizing average tardiness, and (3) Minimizing the number of tardy jobs $\sum U_j$.
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-4">
