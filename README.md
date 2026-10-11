@@ -1,6 +1,6 @@
 # OPM 5610: Job Shop Scheduling Interactive Lab
 
-An interactive, web-based Mixed Integer Programming (MIP) and Operations Research learning platform designed for **OPM 5610 (Advanced Operations Management)** at the University of Mannheim.
+An interactive, web-based Mixed Integer Programming (MIP) and Operations Research learning platform designed for **OPM 5610 (Production Management & Variability)** at the University of Mannheim.
 
 This application provides a hands-on sandbox for visualising job shop scheduling Gantt charts, evaluating disjunctive Big-M constraints, testing JIT/perishable penalty functions, and practicing advanced formulation logic for exam preparation.
 
