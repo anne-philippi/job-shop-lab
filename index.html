@@ -257,7 +257,34 @@
           <span class="font-bold text-emerald-800">Question:</span> Consider job shop scheduling in a dairy factory with perishable products. Each job $j$ has a due date $d_j$, earliness storage cost $q_j$ per unit, and tardiness penalty $u_j$ per unit. Change the model to minimize total costs related to earliness and tardiness.
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        <!-- Industry Trade-off Presets -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Industry Cost Presets ($q_j$ vs. $u_j$ Trade-offs):</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+            <button id="preset-dairy" onclick="setScenario('dairy')" class="p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold shadow-sm">
+              <div class="font-bold font-mono text-emerald-800">1. Dairy / Perishables ($q_j > u_j$)</div>
+              <div class="text-[11px] text-slate-600 mt-1">High holding/spoilage penalty ($q_1=8, q_2=10$). Model prefers finishing slightly late over storing perishable goods.</div>
+            </button>
+            <button id="preset-auto" onclick="setScenario('auto')" class="p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
+              <div class="font-bold font-mono text-amber-800">2. Automotive JIT ($u_j \gg q_j$)</div>
+              <div class="text-[11px] text-slate-600 mt-1">Extreme late penalty ($u_1=25, u_2=30$). Late assembly stops OEM lines. Model prefers buffering early.</div>
+            </button>
+            <button id="preset-tech" onclick="setScenario('tech')" class="p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
+              <div class="font-bold font-mono text-sky-800">3. High-Tech / Cleanroom ($q_j \approx u_j$)</div>
+              <div class="text-[11px] text-slate-600 mt-1">Balanced penalties ($q=5, u=6$). Cleanroom contamination risk vs. customer delivery window.</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Industry Trade-off Banner -->
+        <div id="industry-scenario-banner" class="p-3.5 bg-slate-100 border border-slate-200 rounded-lg text-xs space-y-1">
+          <span class="font-bold text-slate-800 block" id="scenario-title">Selected Trade-off: Dairy &amp; Perishable Foods ($q_j > u_j$)</span>
+          <p class="text-slate-600 text-[11px] leading-relaxed" id="scenario-desc">
+            Refrigeration energy and finite shelf-life mean storing finished dairy products early costs more per hour than minor customer delay. The optimizer actively penalizes earliness $E_j$.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Problem 1(b.ii): Perishable Dairy Factory Sandbox</h3>
             <p class="text-xs text-slate-500 mt-0.5">Minimize total earliness &amp; tardiness costs using completion time on last machine $l_j$.</p>
@@ -267,6 +294,7 @@
             <span id="dairy-total-cost" class="text-2xl font-bold font-mono text-amber-600">0.00 €</span>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
@@ -280,16 +308,16 @@
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)</label>
-                <input type="number" id="input-q1" min="0" max="100" step="0.5" value="2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold outline-none" />
+                <input type="number" id="input-q1" min="0" max="100" step="0.5" value="8" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)</label>
-                <input type="number" id="input-u1" min="0" max="100" step="0.5" value="5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
+                <input type="number" id="input-u1" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
             <div class="pt-2 text-[11px] text-slate-700 space-y-1">
-              <div>$E_1 \ge d_1 - X_{1, l_1} - p_{1, l_1} \implies E_1 = $ <span id="dairy-e1" class="text-slate-900">0</span> &times; <span id="rate-q1">2.00</span>€ = <span id="dairy-e1-cost" class="text-emerald-700 font-semibold">0.00 €</span></div>
-              <div>$T_1 \ge X_{1, l_1} + p_{1, l_1} - d_1 \implies T_1 = $ <span id="dairy-t1" class="text-slate-900">0</span> &times; <span id="rate-u1">5.00</span>€ = <span id="dairy-t1-cost" class="text-rose-600 font-semibold">0.00 €</span></div>
+              <div>$E_1 \ge d_1 - X_{1, l_1} - p_{1, l_1} \implies E_1 = $ <span id="dairy-e1" class="text-slate-900">0</span> &times; <span id="rate-q1">8.00</span>€ = <span id="dairy-e1-cost" class="text-emerald-700 font-semibold">0.00 €</span></div>
+              <div>$T_1 \ge X_{1, l_1} + p_{1, l_1} - d_1 \implies T_1 = $ <span id="dairy-t1" class="text-slate-900">0</span> &times; <span id="rate-u1">3.00</span>€ = <span id="dairy-t1-cost" class="text-rose-600 font-semibold">0.00 €</span></div>
             </div>
           </div>
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
@@ -304,16 +332,16 @@
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)</label>
-                <input type="number" id="input-q2" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold outline-none" />
+                <input type="number" id="input-q2" min="0" max="100" step="0.5" value="10" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)</label>
-                <input type="number" id="input-u2" min="0" max="100" step="0.5" value="6" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
+                <input type="number" id="input-u2" min="0" max="100" step="0.5" value="4" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
             <div class="pt-2 text-[11px] text-slate-700 space-y-1">
-              <div>$E_2 \ge d_2 - X_{2, l_2} - p_{2, l_2} \implies E_2 = $ <span id="dairy-e2" class="text-slate-900">0</span> &times; <span id="rate-q2">3.00</span>€ = <span id="dairy-e2-cost" class="text-yellow-700 font-semibold">0.00 €</span></div>
-              <div>$T_2 \ge X_{2, l_2} + p_{2, l_2} - d_2 \implies T_2 = $ <span id="dairy-t2" class="text-slate-900">0</span> &times; <span id="rate-u2">6.00</span>€ = <span id="dairy-t2-cost" class="text-rose-600 font-semibold">0.00 €</span></div>
+              <div>$E_2 \ge d_2 - X_{2, l_2} - p_{2, l_2} \implies E_2 = $ <span id="dairy-e2" class="text-slate-900">0</span> &times; <span id="rate-q2">10.00</span>€ = <span id="dairy-e2-cost" class="text-yellow-700 font-semibold">0.00 €</span></div>
+              <div>$T_2 \ge X_{2, l_2} + p_{2, l_2} - d_2 \implies T_2 = $ <span id="dairy-t2" class="text-slate-900">0</span> &times; <span id="rate-u2">4.00</span>€ = <span id="dairy-t2-cost" class="text-rose-600 font-semibold">0.00 €</span></div>
             </div>
           </div>
         </div>
@@ -605,7 +633,6 @@
     let quizScore = 0;
     let quizAnswers = {};
 
-    // Shuffles options dynamically using Fisher-Yates
     function buildShuffledQuizData() {
       return rawQuizData.map(q => {
         let indices = q.options.map((_, i) => i);
@@ -728,6 +755,50 @@
           : "p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
       });
       render();
+    }
+
+    function setScenario(type) {
+      const btnDairy = document.getElementById('preset-dairy');
+      const btnAuto = document.getElementById('preset-auto');
+      const btnTech = document.getElementById('preset-tech');
+
+      const title = document.getElementById('scenario-title');
+      const desc = document.getElementById('scenario-desc');
+
+      [btnDairy, btnAuto, btnTech].forEach(b => {
+        b.className = "p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm";
+      });
+
+      if (type === 'dairy') {
+        btnDairy.className = "p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold shadow-sm";
+        document.getElementById('input-q1').value = 8;
+        document.getElementById('input-u1').value = 3;
+        document.getElementById('input-q2').value = 10;
+        document.getElementById('input-u2').value = 4;
+
+        title.textContent = "Selected Trade-off: Dairy & Perishable Foods (q_j > u_j)";
+        desc.textContent = "Refrigeration energy and finite shelf-life mean storing finished dairy products early costs more per hour than minor customer delay. The optimizer actively penalizes earliness E_j.";
+      } else if (type === 'auto') {
+        btnAuto.className = "p-3 rounded-lg border text-left transition bg-amber-50 border-amber-500 text-amber-900 font-semibold shadow-sm";
+        document.getElementById('input-q1').value = 1;
+        document.getElementById('input-u1').value = 25;
+        document.getElementById('input-q2').value = 2;
+        document.getElementById('input-u2').value = 30;
+
+        title.textContent = "Selected Trade-off: Automotive Just-In-Sequence (u_j >> q_j)";
+        desc.textContent = "Late deliveries stop an OEM assembly line costing up to €10,000/min in contractual fines. Storing modules in staging yards (q_j) is cheap, so the model buffers production early.";
+      } else if (type === 'tech') {
+        btnTech.className = "p-3 rounded-lg border text-left transition bg-sky-50 border-sky-500 text-sky-900 font-semibold shadow-sm";
+        document.getElementById('input-q1').value = 5;
+        document.getElementById('input-u1').value = 6;
+        document.getElementById('input-q2').value = 5;
+        document.getElementById('input-u2').value = 6;
+
+        title.textContent = "Selected Trade-off: High-Tech Cleanroom Electronics (q_j ≈ u_j)";
+        desc.textContent = "Cleanroom storage carries airborne contamination risks and high tied-up working capital (q_j), balanced evenly against customer delivery windows (u_j).";
+      }
+
+      evaluate();
     }
 
     function renderQuiz() {
@@ -1090,14 +1161,6 @@
         });
       }
     }
-
-    window.setScenario = function(q1, u1, q2, u2) {
-      document.getElementById('input-q1').value = q1;
-      document.getElementById('input-u1').value = u1;
-      document.getElementById('input-q2').value = q2;
-      document.getElementById('input-u2').value = u2;
-      evaluate();
-    };
 
     document.getElementById('btn-solution').onclick = () => {
       ops.j1_m3.start = 0; ops.j1_m2.start = 4; ops.j1_m1.start = 7;
