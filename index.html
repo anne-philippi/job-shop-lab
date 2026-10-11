@@ -104,7 +104,6 @@
           <span>Gantt Chart</span>
           <button class="info-circle" onclick="openModal('cmax')" title="Makespan Information">i</button>
         </div>
-        <!-- Brazil-core Legend -->
         <div class="flex items-center gap-4 text-xs font-mono text-slate-600">
           <span class="flex items-center gap-1.5 font-semibold">
             <span class="w-3 h-3 rounded bg-[#009c3b] border border-emerald-600"></span> Job 1 (Green): M3 &rarr; M2 &rarr; M1 ($l_1 = 1$)
@@ -115,7 +114,7 @@
         </div>
       </div>
 
-      <!-- Time Header (16 columns fixed) -->
+      <!-- Time Header -->
       <div class="flex items-center">
         <div class="w-16 md:w-20 text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider">Machine</div>
         <div class="flex-1 grid grid-cols-16 text-center text-xs font-mono text-slate-500 border-b border-slate-200 pb-1" style="display: grid; grid-template-columns: repeat(16, minmax(0, 1fr));">
@@ -124,7 +123,7 @@
         </div>
       </div>
 
-      <!-- Machine 1 Track -->
+      <!-- Machine Tracks -->
       <div class="flex items-center">
         <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-700 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span> M<sub>1</sub>
@@ -133,7 +132,6 @@
         <div class="flex-1 gantt-track-grid bg-slate-50 rounded border border-slate-200" data-machine="1"></div>
       </div>
 
-      <!-- Machine 2 Track -->
       <div class="flex items-center">
         <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-700 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span> M<sub>2</sub>
@@ -142,7 +140,6 @@
         <div class="flex-1 gantt-track-grid bg-slate-50 rounded border border-slate-200" data-machine="2"></div>
       </div>
 
-      <!-- Machine 3 Track -->
       <div class="flex items-center">
         <div class="w-16 md:w-20 font-mono text-xs font-bold text-slate-700 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span> M<sub>3</sub>
@@ -169,9 +166,8 @@
       </div>
     </div>
 
-    <!-- FIVE EXTENSION TABS -->
+    <!-- TABS SECTION -->
     <section class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-      <!-- Tab Header Buttons -->
       <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-medium overflow-x-auto">
         <button id="tab-btn-bigm" class="px-4 py-2.5 border-b-2 border-emerald-600 text-emerald-800 bg-white font-semibold flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('bigm')">
           <span>Big-M &amp; Disjunctive Formulation</span>
@@ -190,16 +186,16 @@
           <span class="info-circle" onclick="event.stopPropagation(); openModal('tardiness_info')">i</span>
         </button>
         <button id="tab-btn-quiz" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('quiz')">
-          <span>Formulation Practice (Exam Prep)</span>
+          <span>Hardcore Exam Prep (10 Challenges)</span>
           <span class="info-circle" onclick="event.stopPropagation(); openModal('quiz_info')">i</span>
         </button>
       </div>
 
-      <!-- Tab 1: Big-M & Disjunctive Logic -->
+      <!-- Tab 1: Big-M -->
       <div id="tab-content-bigm" class="p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <p class="text-xs text-slate-500 max-w-2xl">
-            Inspect how the disjunctive binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and the Big-M parameter enforce that two jobs cannot be processed simultaneously on machine $\alpha$.
+            Inspect how binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and Big-M enforce non-overlapping processing on machine $\alpha$.
           </p>
           <div class="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded border border-slate-200 text-xs">
             <label class="text-slate-600 font-mono">Parameter $\text{bigM}$:</label>
@@ -207,12 +203,10 @@
             <span id="bigm-slider-val" class="font-mono font-bold text-emerald-700">15</span>
           </div>
         </div>
-
-        <!-- Big-M Evaluation Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono" id="bigm-equations-cards"></div>
       </div>
 
-      <!-- Tab 2: Maintenance Task (1b.i) -->
+      <!-- Tab 2: Maintenance -->
       <div id="tab-content-maint" class="p-5 space-y-4 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -224,7 +218,6 @@
             <input type="checkbox" id="maint-active-check" class="w-4 h-4 rounded text-emerald-600 cursor-pointer" />
           </div>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-2">
             <label class="block text-slate-600 font-mono">Target Machine ($\alpha^*$):</label>
@@ -245,7 +238,7 @@
         </div>
       </div>
 
-      <!-- Tab 3: Dairy Perishable JIT Cost (1b.ii) -->
+      <!-- Tab 3: Dairy JIT -->
       <div id="tab-content-dairy" class="p-5 space-y-4 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -257,22 +250,7 @@
             <span id="dairy-total-cost" class="text-2xl font-bold font-mono text-amber-600">0.00 €</span>
           </div>
         </div>
-
-        <div class="flex flex-wrap items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-          <span class="text-slate-600 font-medium mr-1">Trade-Off Scenarios:</span>
-          <button onclick="setScenario(2, 5, 3, 6)" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-emerald-700 rounded border border-slate-300 font-mono">
-            Balanced ($q \approx u$)
-          </button>
-          <button onclick="setScenario(15, 2, 12, 3)" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-yellow-700 rounded border border-slate-300 font-mono">
-            High Perishability ($q \gg u$)
-          </button>
-          <button onclick="setScenario(1, 25, 2, 30)" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-rose-700 rounded border border-slate-300 font-mono">
-            Strict Customer Due Dates ($u \gg q$)
-          </button>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <!-- Job 1 Controls -->
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
               <span class="text-emerald-700 font-bold">Job 1 ($l_1 = 1$, Machine M1)</span>
@@ -281,15 +259,15 @@
             <div class="grid grid-cols-3 gap-2">
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_1$)</label>
-                <input type="number" id="input-d1" min="1" max="20" step="1" value="8" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold focus:ring-1 focus:ring-emerald-500 outline-none" />
+                <input type="number" id="input-d1" min="1" max="20" step="1" value="8" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)</label>
-                <input type="number" id="input-q1" min="0" max="100" step="0.5" value="2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold focus:ring-1 focus:ring-emerald-500 outline-none" />
+                <input type="number" id="input-q1" min="0" max="100" step="0.5" value="2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)</label>
-                <input type="number" id="input-u1" min="0" max="100" step="0.5" value="5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold focus:ring-1 focus:ring-rose-500 outline-none" />
+                <input type="number" id="input-u1" min="0" max="100" step="0.5" value="5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
             <div class="pt-2 text-[11px] text-slate-700 space-y-1">
@@ -297,8 +275,6 @@
               <div>$T_1 \ge X_{1, l_1} + p_{1, l_1} - d_1 \implies T_1 = $ <span id="dairy-t1" class="text-slate-900">0</span> &times; <span id="rate-u1">5.00</span>€ = <span id="dairy-t1-cost" class="text-rose-600 font-semibold">0.00 €</span></div>
             </div>
           </div>
-
-          <!-- Job 2 Controls -->
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
               <span class="text-yellow-700 font-bold">Job 2 ($l_2 = 3$, Machine M3)</span>
@@ -307,15 +283,15 @@
             <div class="grid grid-cols-3 gap-2">
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_2$)</label>
-                <input type="number" id="input-d2" min="1" max="20" step="1" value="10" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold focus:ring-1 focus:ring-yellow-500 outline-none" />
+                <input type="number" id="input-d2" min="1" max="20" step="1" value="10" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)</label>
-                <input type="number" id="input-q2" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold focus:ring-1 focus:ring-yellow-500 outline-none" />
+                <input type="number" id="input-q2" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold outline-none" />
               </div>
               <div>
                 <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)</label>
-                <input type="number" id="input-u2" min="0" max="100" step="0.5" value="6" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold focus:ring-1 focus:ring-rose-500 outline-none" />
+                <input type="number" id="input-u2" min="0" max="100" step="0.5" value="6" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
             <div class="pt-2 text-[11px] text-slate-700 space-y-1">
@@ -326,19 +302,15 @@
         </div>
       </div>
 
-      <!-- Tab 4: Task 1c Alternative Objectives -->
+      <!-- Tab 4: Tardiness Objectives -->
       <div id="tab-content-tardiness" class="p-5 space-y-4 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Task 1c: Alternative Tardiness Objectives</h3>
             <p class="text-xs text-slate-500 mt-0.5">Explore how the model adapts when changing optimization criteria from cost to service metrics.</p>
           </div>
-          <div class="flex items-center gap-2">
-            <button class="info-circle" onclick="openModal('tardiness_info')">i</button>
-          </div>
+          <button class="info-circle" onclick="openModal('tardiness_info')">i</button>
         </div>
-
-        <!-- Objective Switcher -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <button id="btn-obj-max" onclick="setObjective('max')" class="p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-bold">
             <div class="font-bold font-mono">1. Minimize Maximum Tardiness</div>
@@ -353,30 +325,25 @@
             <div class="text-[11px] text-slate-600 mt-1">$$\text{Minimize } \sum_{j=1}^{J} U_j$$</div>
           </button>
         </div>
-
-        <!-- Objective Formulation & Calculation Cards -->
         <div id="tardiness-display-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono"></div>
       </div>
 
-      <!-- Tab 5: Formulation Practice (Exam Prep) -->
+      <!-- Tab 5: Hardcore Exam Practice (10 Questions) -->
       <div id="tab-content-quiz" class="p-5 space-y-4 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 class="text-sm font-semibold text-slate-800">Exam Preparation: Formulation Practice</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Test your ability to formulate non-standard scheduling constraints and objective functions.</p>
+            <h3 class="text-sm font-semibold text-slate-800">Hardcore Exam Prep: 10 Formulation Challenges</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Master constraint building for complex non-standard scheduling exam questions.</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
-            <span class="text-slate-500">Score: <span id="quiz-score" class="font-bold text-emerald-700">0 / 4</span></span>
-            <button onclick="resetQuiz()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">Reset Quiz</button>
+            <span class="text-slate-500">Score: <span id="quiz-score" class="font-bold text-emerald-700">0 / 10</span></span>
+            <button onclick="resetQuiz()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">Reset Practice</button>
           </div>
         </div>
 
-        <!-- Quiz Container -->
-        <div id="quiz-card" class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4 text-xs font-mono">
-          <!-- Populated dynamically via JavaScript -->
-        </div>
+        <!-- Quiz Display -->
+        <div id="quiz-card" class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4 text-xs font-mono"></div>
       </div>
-
     </section>
 
   </main>
@@ -395,19 +362,14 @@
     </div>
   </div>
 
-  <!-- Footnote Layout Banner -->
+  <!-- Footer Banner -->
   <footer class="w-full bg-[#031533] border-t border-sky-950 py-3.5 px-6 mt-8">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
       <div>
         <h4 class="text-sm font-bold text-white tracking-wide">Developed by Anne Philippi</h4>
         <p class="text-xs text-slate-400">MSc Student in Operations &amp; Supply Chain Management &middot; Universit&auml;t Mannheim</p>
       </div>
-      <a 
-        href="https://www.linkedin.com/in/anne-philippi/" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0077B5] hover:bg-[#006097] text-white rounded font-medium text-xs shadow-md transition"
-      >
+      <a href="https://www.linkedin.com/in/anne-philippi/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0077B5] hover:bg-[#006097] text-white rounded font-medium text-xs shadow-md transition">
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
           <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
         </svg>
@@ -416,7 +378,7 @@
     </div>
   </footer>
 
-  <!-- Application Logic -->
+  <!-- Logic Code -->
   <script>
     const ops = {
       j1_m3: { job: 1, machine: 3, p: 4, start: 0, label: 'J1 on M3 (p=4)' },
@@ -431,122 +393,133 @@
     let currentTab = 'bigm';
     let currentObjMode = 'max';
 
-    // Quiz Questions Data
+    // 10 Hardcore Exam Practice Questions with Corrected KaTeX Formatting
     const quizData = [
       {
         id: 1,
         title: "Challenge 1: Sequence-Dependent Setup Times ($s_{ij}^\\alpha$)",
-        scenario: "Cleaning a dairy tank requires $s_{12}^2 = 2$ time units when switching from Job 1 to Job 2 on Machine 2, but no setup time when switching from Job 2 to Job 1 ($s_{21}^2 = 0$). Which equation correctly formulates the non-interference constraint when Job 1 precedes Job 2 on Machine 2?",
+        scenario: "Cleaning a tank takes $s_{12}^2 = 2$ units when switching from Job 1 to Job 2 on Machine 2, but $s_{21}^2 = 0$ when switching back. Which constraint enforces non-interference when Job 1 precedes Job 2?",
         options: [
-          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} + s_{12}^2 + (Y_{12}^2 - 1) \\cdot text{bigM}$$",
-          "$$X_{2,2} + s_{12}^2 \\ge X_{1,2} + p_{1,2} + (Y_{12}^2 - 1) \\cdot text{bigM}$$",
-          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} \\cdot s_{12}^2 + (Y_{12}^2 - 1) \\cdot text{bigM}$$"
+          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} + s_{12}^2 + (Y_{12}^2 - 1) \\cdot \\text{bigM}$$",
+          "$$X_{2,2} + s_{12}^2 \\ge X_{1,2} + p_{1,2} + (Y_{12}^2 - 1) \\cdot \\text{bigM}$$",
+          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} \\cdot s_{12}^2 + (Y_{12}^2 - 1) \\cdot \\text{bigM}$$"
         ],
         correct: 0,
-        explanation: "When $Y_{12}^2 = 1$, Job 1 precedes Job 2 on Machine 2. Job 2 cannot start until Job 1 finishes processing ($X_{1,2} + p_{1,2}$) PLUS the required setup time $s_{12}^2$."
+        explanation: "When $Y_{12}^2 = 1$, Job 2 cannot start until Job 1 finishes processing ($X_{1,2} + p_{1,2}$) PLUS the setup lag $s_{12}^2$."
       },
       {
         id: 2,
         title: "Challenge 2: Unscheduled Machine Downtime Window",
-        scenario: "Machine 1 must stop for emergency servicing during interval $[t_1^{\\text{start}}, t_2^{\\text{end}}] = [4, 7]$. How do we ensure no operation on Machine 1 runs during this window?",
+        scenario: "Machine 1 is unavailable during breakdown interval $[4, 7]$. How do we ensure no operation on Machine 1 runs inside $[4, 7]$?",
         options: [
-          "$$\\text{Introduce binary } Z_{j1} \\in \\{0,1\\}: \\quad X_{j,1} + p_{j,1} \\le 4 + text{bigM} \\cdot Z_{j1} \\quad \\text{and} \\quad X_{j,1} \\ge 7 - text{bigM} \\cdot (1 - Z_{j1})$$",
+          "$$\\text{Binary } Z_{j1} \\in \\{0,1\\}: \\quad X_{j,1} + p_{j,1} \\le 4 + \\text{bigM} \\cdot Z_{j1} \\quad \\text{and} \\quad X_{j,1} \\ge 7 - \\text{bigM} \\cdot (1 - Z_{j1})$$",
           "$$X_{j,1} + p_{j,1} \\le 4 \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j,1} \\ge 7 \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
         correct: 0,
-        explanation: "Binary variable $Z_{j1}$ dictates whether job $j$ finishes before time $t=4$ ($Z_{j1}=0$) or starts at/after time $t=7$ ($Z_{j1}=1$), effectively avoiding the blocked window $[4, 7]$."
+        explanation: "Binary variable $Z_{j1}$ dictates whether job $j$ finishes before $t=4$ ($Z_{j1}=0$) or starts at/after $t=7$ ($Z_{j1}=1$)."
       },
       {
         id: 3,
-        title: "Challenge 3: No-Wait Processing Constraint",
-        scenario: "Milk pasteurization requires Job 1 to start on Machine 2 ($M_2$) immediately after completing on Machine 3 ($M_3$) with zero waiting time. Which constraint models this exact no-wait transfer?",
+        title: "Challenge 3: No-Wait Transfer Constraint",
+        scenario: "Job 1 must start on Machine 2 ($M_2$) immediately after completing on Machine 3 ($M_3$) with zero waiting time. Which equation formulates this?",
         options: [
           "$$X_{1,2} = X_{1,3} + p_{1,3}$$",
           "$$X_{1,2} \\ge X_{1,3} + p_{1,3}$$",
           "$$X_{1,2} + p_{1,2} \\le X_{1,3} + p_{1,3}$$"
         ],
         correct: 0,
-        explanation: "Strict equality $X_{1,2} = X_{1,3} + p_{1,3}$ forces the start time on $M_2$ to equal the exact completion time on $M_3$, eliminating intermediate holding time."
+        explanation: "Equality $X_{1,2} = X_{1,3} + p_{1,3}$ forces the start time on $M_2$ to equal the exact finish time on $M_3$."
       },
       {
         id: 4,
         title: "Challenge 4: Maximum Shelf-Life / Perishability Limit ($W_j$)",
-        scenario: "To prevent spoilage, the total duration for job $j$ from starting its first machine $f_j$ to completing its last machine $l_j$ cannot exceed shelf-life parameter $W_j$. Which formulation is correct?",
+        scenario: "Total time spent from starting on first machine $f_j$ to finishing on last machine $l_j$ cannot exceed shelf-life $W_j$. Which formulation is correct?",
         options: [
           "$$X_{j, l_j} + p_{j, l_j} - X_{j, f_j} \\le W_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j, l_j} + p_{j, l_j} \\le W_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j, f_j} + W_j \\ge C_{\\max} \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
         correct: 0,
-        explanation: "$X_{j, f_j}$ is job $j$'s initial start time and $X_{j, l_j} + p_{j, l_j}$ is its final completion time. Their difference is the total time spent in processing, bounded above by $W_j$."
+        explanation: "The total elapsed duration is completion on last machine minus start on first machine, bounded by $W_j$."
+      },
+      {
+        id: 5,
+        title: "Challenge 5: Machine Technical Capability Restriction",
+        scenario: "Job $j$ cannot run on machine $\\alpha$ because the machine lacks technical capabilities. How is this represented?",
+        options: [
+          "$$\\text{Exclude variable } X_{j\\alpha} \\text{ from model or set } p_{j\\alpha} = \\infty$$",
+          "$$X_{j\\alpha} = 0 \\quad \\forall j$$",
+          "$$Y_{ij}^\\alpha = 0 \\quad \\forall i, j$$"
+        ],
+        correct: 0,
+        explanation: "If machine $\\alpha$ is ineligible for job $j$, operation $(j, \\alpha)$ is simply excluded from the decision variable sets."
+      },
+      {
+        id: 6,
+        title: "Challenge 6: Strict Upper Bound on Individual Job Tardiness ($\bar{T}_j$)",
+        scenario: "A contract specifies that tardiness $T_j$ for job $j$ must never exceed maximum allowed limit $\\bar{T}_j$. Which constraint enforces this?",
+        options: [
+          "$$X_{j, l_j} + p_{j, l_j} - d_j \\le \\bar{T}_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
+          "$$T_j + \\bar{T}_j \\le d_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
+          "$$X_{j, l_j} + p_{j, l_j} \\le \\bar{T}_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
+        ],
+        correct: 0,
+        explanation: "Since tardiness is completion time minus due date ($C_j - d_j$), bounding this difference directly by $\\bar{T}_j$ limits maximum delay."
+      },
+      {
+        id: 7,
+        title: "Challenge 7: Minimum Transfer Lead Time Between Machines ($L_{j\\alpha\\bar{\\alpha}}$)",
+        scenario: "Transporting Job $j$ from Machine $\\alpha$ to Machine $\\bar{\\alpha}$ takes minimum transit time $L_{j\\alpha\\bar{\\alpha}}$. How is routing modified?",
+        options: [
+          "$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} + L_{j\\alpha\\bar{\\alpha}} \\quad \\forall j, \\alpha, \\bar{\\alpha} \\text{ with } a_{j\\alpha\\bar{\\alpha}} = 1$$",
+          "$$X_{j\\bar{\\alpha}} + L_{j\\alpha\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha, \\bar{\\alpha}$$",
+          "$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + L_{j\\alpha\\bar{\\alpha}} \\quad \\forall j, \\alpha, \\bar{\\alpha}$$"
+        ],
+        correct: 0,
+        explanation: "Transit time $L_{j\\alpha\\bar{\\alpha}}$ acts as an additive delay after processing finishes ($X_{j\\alpha} + p_{j\\alpha}$) before starting on machine $\\bar{\\alpha}$."
+      },
+      {
+        id: 8,
+        title: "Challenge 8: Common Batch Processing Start Time",
+        scenario: "Jobs 1 and 2 must start simultaneously on Machine 2 as a single batch. Which constraint models synchronized starting?",
+        options: [
+          "$$X_{1,2} = X_{2,2}$$",
+          "$$X_{1,2} + p_{1,2} = X_{2,2} + p_{2,2}$$",
+          "$$X_{1,2} + X_{2,2} = \\text{bigM}$$"
+        ],
+        correct: 0,
+        explanation: "Setting start times equal ($X_{1,2} = X_{2,2}$) synchronizes batch loading."
+      },
+      {
+        id: 9,
+        title: "Challenge 9: Storage & Setup Budget Constraint ($B$)",
+        scenario: "Total earliness holding costs plus fixed setup costs across all jobs cannot exceed total factory budget $B$. Which constraint represents this?",
+        options: [
+          "$$\\sum_{j=1}^{J} (q_j \\cdot E_j + s_j) \\le B$$",
+          "$$\\sum_{j=1}^{J} (u_j \\cdot T_j) \\le B$$",
+          "$$C_{\\max} \\cdot \\sum q_j \\le B$$"
+        ],
+        correct: 0,
+        explanation: "Summing per-job earliness costs ($q_j E_j$) and fixed setup costs ($s_j$) bounds total expenditure by budget parameter $B$."
+      },
+      {
+        id: 10,
+        title: "Challenge 10: Maintenance Window Disjunctive Choice",
+        scenario: "Preventive maintenance on Machine $\\alpha^*$ takes duration $P_M$. Maintenance can happen either BEFORE all jobs or AFTER all jobs finish. Which formulation is correct?",
+        options: [
+          "$$\\text{Binary } V_M \\in \\{0,1\\}: \\quad X_{j\\alpha^*} + p_{j\\alpha^*} \\le S_M + \\text{bigM} \\cdot V_M \\quad \\text{and} \\quad S_M + P_M \\le X_{j\\alpha^*} + \\text{bigM} \\cdot (1 - V_M)$$",
+          "$$S_M + P_M \\le C_{\\max}$$",
+          "$$X_{j\\alpha^*} \\le S_M \\quad \\forall j$$"
+        ],
+        correct: 0,
+        explanation: "Binary variable $V_M$ enforces disjunction between maintenance start time $S_M$ and job processing intervals."
       }
     ];
 
     let currentQuizIndex = 0;
     let quizScore = 0;
     let quizAnswers = {};
-
-    const concepts = {
-      jobshop: {
-        title: "Job Shop Scheduling (JSS)",
-        html: `<p>A production environment where multiple unique jobs are scheduled across several machines. Each job follows its own sequence of operations across workstations.</p>
-               <p>Key properties: non-preemptive processing, dedicated machine capacities, and strict technological sequences.</p>`
-      },
-      cmax: {
-        title: "Makespan ($C_{\\max}$)",
-        html: `<p><b>Makespan</b> is defined as the time the last job finishes and leaves the production system: $$C_{\\max} = \\max(C_1, C_2, \\dots, C_n)$$</p>
-               <p>Minimizing makespan maximizes machine throughput and resource utilization.</p>
-               <p>In Mixed Integer Programming (MIP), it is linearized with bounding constraints over all jobs $j$ and machines $\\alpha$: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$</p>`
-      },
-      alpha: {
-        title: "Machine Indices ($\\alpha, \\bar{\\alpha}$)",
-        html: `<p>$\\alpha$ denotes the current machine, and $\\bar{\\alpha}$ denotes the immediate successor machine along job $j$'s routing path.</p>
-               <p>The parameter $a_{j\\alpha\\bar{\\alpha}} = 1$ indicates that job $j$ visits machine $\\alpha$ directly before $\\bar{\\alpha}$.</p>`
-      },
-      precedence: {
-        title: "Technological Precedence Constraints",
-        html: `<p>Ensures that an operation cannot start until the immediately preceding operation of the same job has finished processing:</p>
-               <p>$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha, \\bar{\\alpha} \\text{ with } a_{j\\alpha\\bar{\\alpha}} = 1$$</p>`
-      },
-      bigm: {
-        title: "Big-M Disjunctive Formulation",
-        html: `<p>Disjunctive constraints prevent two jobs from being processed simultaneously on the same machine:</p>
-               <p>$$X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha} + (Y_{ij}^\\alpha - 1) \\cdot \\text{bigM}$$</p>
-               <p>When $Y_{ij}^\\alpha = 1$, the constraint activates ($X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha}$). When $Y_{ij}^\\alpha = 0$, the constraint relaxes because $-\\text{bigM}$ drops the right-hand side well below 0.</p>`
-      },
-      maintenance: {
-        title: "Preventive Maintenance (1b.i)",
-        html: `<p>$$X_{j\\alpha^*} + p_{j\\alpha^*} \\le t^* \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>
-               <p>1. $X_{j\\alpha^*} + p_{j\\alpha^*}$ gives the completion time of job $j$ on machine $\\alpha^*$.</p>
-               <p>2. Setting this completion time $\\le t^*$ for all jobs ensures all work finishes before $t^*$.</p>
-               <p>3. This frees up machine $\\alpha^*$ starting at time $t^*$ for preventive maintenance.</p>`
-      },
-      dairy: {
-        title: "Perishable Dairy Earliness & Tardiness Model (1b.ii)",
-        html: `<p><b>New Parameters:</b> $d_j$ (due date), $q_j$ (earliness cost/unit), $u_j$ (tardiness penalty/unit), $l_j$ (last machine visited by job $j$).</p>
-               <p><b>New Variables:</b> $E_j \\ge 0$ (earliness), $T_j \\ge 0$ (tardiness).</p>
-               <p><b>Objective Function:</b></p>
-               <p>$$\\text{Minimize } \\sum_{j=1}^{J} (E_j \\cdot q_j + T_j \\cdot u_j)$$</p>
-               <p><b>Constraints:</b></p>
-               <p>$$E_j \\ge d_j - X_{j, l_j} - p_{j, l_j} \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>
-               <p>$$T_j \\ge X_{j, l_j} + p_{j, l_j} - d_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>`
-      },
-      tardiness_info: {
-        title: "Task 1c: Alternative Tardiness Objectives",
-        html: `<p><b>1. Minimize Maximum Tardiness ($T_{\\max}$):</b></p>
-               <p>Linearized by introducing variable $T_{\\max} \\ge 0$ with constraint $$T_{\\max} \\ge X_{j, l_j} + p_{j, l_j} - d_j \\quad \\forall j$$</p>
-               <p><b>2. Minimize Average Tardiness:</b></p>
-               <p>$$\\text{Minimize } \\frac{1}{J}\\sum_{j=1}^{J} T_j$$ using standard tardiness definition $T_j \\ge X_{j, l_j} + p_{j, l_j} - d_j$.</p>
-               <p><b>3. Minimize Number of Tardy Jobs ($\sum U_j$):</b></p>
-               <p>Introduces binary variable $U_j \\in \\{0, 1\\}$ activated via Big-M: $$X_{j, l_j} + p_{j, l_j} - d_j \\le \\text{bigM} \\cdot U_j \\quad \\forall j$$</p>`
-      },
-      quiz_info: {
-        title: "Formulation Practice (Exam Prep)",
-        html: `<p>Practicing algebraic formulations under constraint variations is key for the OPM 5610 exam.</p>
-               <p>Work through the multiple-choice prompts to test your logic on setup times, breakdowns, no-wait rules, and shelf-life limits!</p>`
-      }
-    };
 
     function initKaTeX() {
       if (window.renderMathInElement) {
@@ -595,9 +568,7 @@
           content.classList.add('hidden');
         }
       });
-      if (tab === 'quiz') {
-        renderQuiz();
-      }
+      if (tab === 'quiz') renderQuiz();
       render();
     }
 
@@ -613,10 +584,7 @@
             : 'border-yellow-500 text-yellow-900 bg-yellow-50 hover:bg-yellow-100'
         }`;
         btn.textContent = op.label;
-        btn.onclick = () => {
-          selectedOp = key;
-          highlightPills();
-        };
+        btn.onclick = () => { selectedOp = key; highlightPills(); };
         container.appendChild(btn);
       });
       highlightPills();
@@ -626,37 +594,26 @@
       Object.keys(ops).forEach(key => {
         const btn = document.getElementById(`pill-${key}`);
         if (!btn) return;
-        if (key === selectedOp) {
-          btn.classList.add('ring-2', 'ring-slate-800', 'font-bold');
-        } else {
-          btn.classList.remove('ring-2', 'ring-slate-800', 'font-bold');
-        }
+        if (key === selectedOp) btn.classList.add('ring-2', 'ring-slate-800', 'font-bold');
+        else btn.classList.remove('ring-2', 'ring-slate-800', 'font-bold');
       });
       render();
     }
 
     document.getElementById('nudge-minus').onclick = () => {
-      if (ops[selectedOp].start > 0) {
-        ops[selectedOp].start--;
-        render();
-      }
+      if (ops[selectedOp].start > 0) { ops[selectedOp].start--; render(); }
     };
     document.getElementById('nudge-plus').onclick = () => {
-      if (ops[selectedOp].start + ops[selectedOp].p < 16) {
-        ops[selectedOp].start++;
-        render();
-      }
+      if (ops[selectedOp].start + ops[selectedOp].p < 16) { ops[selectedOp].start++; render(); }
     };
 
     function setObjective(mode) {
       currentObjMode = mode;
       ['max', 'avg', 'num'].forEach(m => {
         const btn = document.getElementById(`btn-obj-${m}`);
-        if (m === mode) {
-          btn.className = "p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-bold";
-        } else {
-          btn.className = "p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
-        }
+        btn.className = (m === mode)
+          ? "p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-bold"
+          : "p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
       });
       render();
     }
@@ -672,11 +629,8 @@
       let optionsHTML = q.options.map((opt, idx) => {
         let btnStyle = "bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
         if (isAnswered) {
-          if (idx === q.correct) {
-            btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-900 font-bold";
-          } else if (idx === selectedOpt) {
-            btnStyle = "bg-rose-100 border-rose-500 text-rose-900 font-bold";
-          }
+          if (idx === q.correct) btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-900 font-bold";
+          else if (idx === selectedOpt) btnStyle = "bg-rose-100 border-rose-500 text-rose-900 font-bold";
         }
         return `
           <button onclick="answerQuiz(${idx})" ${isAnswered ? 'disabled' : ''} class="w-full p-3 rounded-lg border text-left text-xs transition ${btnStyle}">
@@ -721,25 +675,17 @@
       if (quizAnswers[q.id] !== undefined) return;
 
       quizAnswers[q.id] = optionIdx;
-      if (optionIdx === q.correct) {
-        quizScore++;
-      }
+      if (optionIdx === q.correct) quizScore++;
       document.getElementById('quiz-score').textContent = `${quizScore} / ${quizData.length}`;
       renderQuiz();
     }
 
     function prevQuiz() {
-      if (currentQuizIndex > 0) {
-        currentQuizIndex--;
-        renderQuiz();
-      }
+      if (currentQuizIndex > 0) { currentQuizIndex--; renderQuiz(); }
     }
 
     function nextQuiz() {
-      if (currentQuizIndex < quizData.length - 1) {
-        currentQuizIndex++;
-        renderQuiz();
-      }
+      if (currentQuizIndex < quizData.length - 1) { currentQuizIndex++; renderQuiz(); }
     }
 
     function resetQuiz() {
@@ -817,23 +763,13 @@
       const violations = [];
       let cMax = 0;
 
-      Object.values(ops).forEach(op => {
-        cMax = Math.max(cMax, op.start + op.p);
-      });
+      Object.values(ops).forEach(op => { cMax = Math.max(cMax, op.start + op.p); });
       document.getElementById('kpi-cmax-val').textContent = cMax;
 
-      if (ops.j1_m2.start < ops.j1_m3.start + ops.j1_m3.p) {
-        violations.push(`J1 precedence: M2 starts before M3 completes.`);
-      }
-      if (ops.j1_m1.start < ops.j1_m2.start + ops.j1_m2.p) {
-        violations.push(`J1 precedence: M1 starts before M2 completes.`);
-      }
-      if (ops.j2_m1.start < ops.j2_m2.start + ops.j2_m2.p) {
-        violations.push(`J2 precedence: M1 starts before M2 completes.`);
-      }
-      if (ops.j2_m3.start < ops.j2_m1.start + ops.j2_m1.p) {
-        violations.push(`J2 precedence: M3 starts before M1 completes.`);
-      }
+      if (ops.j1_m2.start < ops.j1_m3.start + ops.j1_m3.p) violations.push(`J1 precedence: M2 starts before M3 completes.`);
+      if (ops.j1_m1.start < ops.j1_m2.start + ops.j1_m2.p) violations.push(`J1 precedence: M1 starts before M2 completes.`);
+      if (ops.j2_m1.start < ops.j2_m2.start + ops.j2_m2.p) violations.push(`J2 precedence: M1 starts before M2 completes.`);
+      if (ops.j2_m3.start < ops.j2_m1.start + ops.j2_m1.p) violations.push(`J2 precedence: M3 starts before M1 completes.`);
 
       const checkOverlap = (m, a, b) => {
         if (Math.max(a.start, b.start) < Math.min(a.start + a.p, b.start + b.p)) {
