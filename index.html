@@ -169,7 +169,7 @@
       </div>
     </div>
 
-    <!-- FOUR EXTENSION TABS -->
+    <!-- FIVE EXTENSION TABS -->
     <section class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       <!-- Tab Header Buttons -->
       <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-medium overflow-x-auto">
@@ -188,6 +188,10 @@
         <button id="tab-btn-tardiness" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('tardiness')">
           <span>Tardiness Extensions (1c)</span>
           <span class="info-circle" onclick="event.stopPropagation(); openModal('tardiness_info')">i</span>
+        </button>
+        <button id="tab-btn-quiz" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('quiz')">
+          <span>Formulation Practice (Exam Prep)</span>
+          <span class="info-circle" onclick="event.stopPropagation(); openModal('quiz_info')">i</span>
         </button>
       </div>
 
@@ -336,7 +340,7 @@
 
         <!-- Objective Switcher -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <button id="btn-obj-max" onclick="setObjective('max')" class="p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900">
+          <button id="btn-obj-max" onclick="setObjective('max')" class="p-3 rounded-lg border text-left transition bg-emerald-50 border-emerald-500 text-emerald-900 font-bold">
             <div class="font-bold font-mono">1. Minimize Maximum Tardiness</div>
             <div class="text-[11px] text-slate-600 mt-1">$$\text{Minimize } T_{\max}$$</div>
           </button>
@@ -351,10 +355,28 @@
         </div>
 
         <!-- Objective Formulation & Calculation Cards -->
-        <div id="tardiness-display-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <!-- Dynamically populated -->
+        <div id="tardiness-display-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono"></div>
+      </div>
+
+      <!-- Tab 5: Formulation Practice (Exam Prep) -->
+      <div id="tab-content-quiz" class="p-5 space-y-4 hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-800">Exam Preparation: Formulation Practice</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Test your ability to formulate non-standard scheduling constraints and objective functions.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono">
+            <span class="text-slate-500">Score: <span id="quiz-score" class="font-bold text-emerald-700">0 / 4</span></span>
+            <button onclick="resetQuiz()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">Reset Quiz</button>
+          </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-card" class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4 text-xs font-mono">
+          <!-- Populated dynamically via JavaScript -->
         </div>
       </div>
+
     </section>
 
   </main>
@@ -409,6 +431,62 @@
     let currentTab = 'bigm';
     let currentObjMode = 'max';
 
+    // Quiz Questions Data
+    const quizData = [
+      {
+        id: 1,
+        title: "Challenge 1: Sequence-Dependent Setup Times ($s_{ij}^\\alpha$)",
+        scenario: "Cleaning a dairy tank requires $s_{12}^2 = 2$ time units when switching from Job 1 to Job 2 on Machine 2, but no setup time when switching from Job 2 to Job 1 ($s_{21}^2 = 0$). Which equation correctly formulates the non-interference constraint when Job 1 precedes Job 2 on Machine 2?",
+        options: [
+          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} + s_{12}^2 + (Y_{12}^2 - 1) \\cdot text{bigM}$$",
+          "$$X_{2,2} + s_{12}^2 \\ge X_{1,2} + p_{1,2} + (Y_{12}^2 - 1) \\cdot text{bigM}$$",
+          "$$X_{2,2} \\ge X_{1,2} + p_{1,2} \\cdot s_{12}^2 + (Y_{12}^2 - 1) \\cdot text{bigM}$$"
+        ],
+        correct: 0,
+        explanation: "When $Y_{12}^2 = 1$, Job 1 precedes Job 2 on Machine 2. Job 2 cannot start until Job 1 finishes processing ($X_{1,2} + p_{1,2}$) PLUS the required setup time $s_{12}^2$."
+      },
+      {
+        id: 2,
+        title: "Challenge 2: Unscheduled Machine Downtime Window",
+        scenario: "Machine 1 must stop for emergency servicing during interval $[t_1^{\\text{start}}, t_2^{\\text{end}}] = [4, 7]$. How do we ensure no operation on Machine 1 runs during this window?",
+        options: [
+          "$$\\text{Introduce binary } Z_{j1} \\in \\{0,1\\}: \\quad X_{j,1} + p_{j,1} \\le 4 + text{bigM} \\cdot Z_{j1} \\quad \\text{and} \\quad X_{j,1} \\ge 7 - text{bigM} \\cdot (1 - Z_{j1})$$",
+          "$$X_{j,1} + p_{j,1} \\le 4 \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
+          "$$X_{j,1} \\ge 7 \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
+        ],
+        correct: 0,
+        explanation: "Binary variable $Z_{j1}$ dictates whether job $j$ finishes before time $t=4$ ($Z_{j1}=0$) or starts at/after time $t=7$ ($Z_{j1}=1$), effectively avoiding the blocked window $[4, 7]$."
+      },
+      {
+        id: 3,
+        title: "Challenge 3: No-Wait Processing Constraint",
+        scenario: "Milk pasteurization requires Job 1 to start on Machine 2 ($M_2$) immediately after completing on Machine 3 ($M_3$) with zero waiting time. Which constraint models this exact no-wait transfer?",
+        options: [
+          "$$X_{1,2} = X_{1,3} + p_{1,3}$$",
+          "$$X_{1,2} \\ge X_{1,3} + p_{1,3}$$",
+          "$$X_{1,2} + p_{1,2} \\le X_{1,3} + p_{1,3}$$"
+        ],
+        correct: 0,
+        explanation: "Strict equality $X_{1,2} = X_{1,3} + p_{1,3}$ forces the start time on $M_2$ to equal the exact completion time on $M_3$, eliminating intermediate holding time."
+      },
+      {
+        id: 4,
+        title: "Challenge 4: Maximum Shelf-Life / Perishability Limit ($W_j$)",
+        scenario: "To prevent spoilage, the total duration for job $j$ from starting its first machine $f_j$ to completing its last machine $l_j$ cannot exceed shelf-life parameter $W_j$. Which formulation is correct?",
+        options: [
+          "$$X_{j, l_j} + p_{j, l_j} - X_{j, f_j} \\le W_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
+          "$$X_{j, l_j} + p_{j, l_j} \\le W_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
+          "$$X_{j, f_j} + W_j \\ge C_{\\max} \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
+        ],
+        correct: 0,
+        explanation: "$X_{j, f_j}$ is job $j$'s initial start time and $X_{j, l_j} + p_{j, l_j}$ is its final completion time. Their difference is the total time spent in processing, bounded above by $W_j$."
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswers = {};
+
     const concepts = {
       jobshop: {
         title: "Job Shop Scheduling (JSS)",
@@ -462,6 +540,11 @@
                <p>$$\\text{Minimize } \\frac{1}{J}\\sum_{j=1}^{J} T_j$$ using standard tardiness definition $T_j \\ge X_{j, l_j} + p_{j, l_j} - d_j$.</p>
                <p><b>3. Minimize Number of Tardy Jobs ($\sum U_j$):</b></p>
                <p>Introduces binary variable $U_j \\in \\{0, 1\\}$ activated via Big-M: $$X_{j, l_j} + p_{j, l_j} - d_j \\le \\text{bigM} \\cdot U_j \\quad \\forall j$$</p>`
+      },
+      quiz_info: {
+        title: "Formulation Practice (Exam Prep)",
+        html: `<p>Practicing algebraic formulations under constraint variations is key for the OPM 5610 exam.</p>
+               <p>Work through the multiple-choice prompts to test your logic on setup times, breakdowns, no-wait rules, and shelf-life limits!</p>`
       }
     };
 
@@ -501,7 +584,7 @@
 
     function selectTab(tab) {
       currentTab = tab;
-      ['bigm', 'maint', 'dairy', 'tardiness'].forEach(t => {
+      ['bigm', 'maint', 'dairy', 'tardiness', 'quiz'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         const content = document.getElementById(`tab-content-${t}`);
         if (t === tab) {
@@ -512,6 +595,9 @@
           content.classList.add('hidden');
         }
       });
+      if (tab === 'quiz') {
+        renderQuiz();
+      }
       render();
     }
 
@@ -573,6 +659,95 @@
         }
       });
       render();
+    }
+
+    function renderQuiz() {
+      const card = document.getElementById('quiz-card');
+      if (!card) return;
+
+      const q = quizData[currentQuizIndex];
+      const isAnswered = quizAnswers[q.id] !== undefined;
+      const selectedOpt = quizAnswers[q.id];
+
+      let optionsHTML = q.options.map((opt, idx) => {
+        let btnStyle = "bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
+        if (isAnswered) {
+          if (idx === q.correct) {
+            btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-900 font-bold";
+          } else if (idx === selectedOpt) {
+            btnStyle = "bg-rose-100 border-rose-500 text-rose-900 font-bold";
+          }
+        }
+        return `
+          <button onclick="answerQuiz(${idx})" ${isAnswered ? 'disabled' : ''} class="w-full p-3 rounded-lg border text-left text-xs transition ${btnStyle}">
+            <div>${opt}</div>
+          </button>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <span class="font-bold text-emerald-700 text-sm">${q.title}</span>
+          <span class="text-slate-400">Question ${currentQuizIndex + 1} of ${quizData.length}</span>
+        </div>
+        <p class="text-slate-700 text-xs leading-relaxed font-sans">${q.scenario}</p>
+        <div class="space-y-2 pt-1">${optionsHTML}</div>
+        ${
+          isAnswered
+            ? `<div class="p-3 bg-slate-100 border border-slate-200 rounded-lg text-xs text-slate-700 font-sans leading-relaxed">
+                 <span class="font-bold text-slate-900">Explanation: </span>${q.explanation}
+               </div>`
+            : ''
+        }
+        <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+          <button onclick="prevQuiz()" ${currentQuizIndex === 0 ? 'disabled' : ''} class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 disabled:opacity-50 text-slate-700 rounded text-xs">Previous</button>
+          <button onclick="nextQuiz()" ${currentQuizIndex === quizData.length - 1 ? 'disabled' : ''} class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded text-xs font-semibold">Next Question</button>
+        </div>
+      `;
+
+      if (window.renderMathInElement) {
+        renderMathInElement(card, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function answerQuiz(optionIdx) {
+      const q = quizData[currentQuizIndex];
+      if (quizAnswers[q.id] !== undefined) return;
+
+      quizAnswers[q.id] = optionIdx;
+      if (optionIdx === q.correct) {
+        quizScore++;
+      }
+      document.getElementById('quiz-score').textContent = `${quizScore} / ${quizData.length}`;
+      renderQuiz();
+    }
+
+    function prevQuiz() {
+      if (currentQuizIndex > 0) {
+        currentQuizIndex--;
+        renderQuiz();
+      }
+    }
+
+    function nextQuiz() {
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        renderQuiz();
+      }
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      quizAnswers = {};
+      document.getElementById('quiz-score').textContent = `0 / ${quizData.length}`;
+      renderQuiz();
     }
 
     function render() {
