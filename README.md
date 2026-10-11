@@ -68,4 +68,4 @@ No build step or `npm install` required!
 
 1. Clone this repository:
    ```bash
-   git clone [https://github.com/your-username/opm5610-jobshop-lab.git](https://github.com/your-username/opm5610-jobshop-lab.git)
+   git clone [https://github.com/anne-philippi/job-shop-lab.git](https://github.com/anne-philippi/job-shop-lab.git)
