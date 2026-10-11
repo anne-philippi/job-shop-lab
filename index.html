@@ -476,8 +476,8 @@
       }
     };
 
-    // 10 Exam Practice Questions
-    const quizData = [
+    // Raw quiz definitions
+    const rawQuizData = [
       {
         id: 1,
         title: "Challenge 1: Sequence-Dependent Setup Times ($s_{ij}^\\alpha$)",
@@ -487,7 +487,7 @@
           "$$X_{2,2} + s_{12}^2 \\ge X_{1,2} + p_{1,2} + (Y_{12}^2 - 1) \\cdot \\text{bigM}$$",
           "$$X_{2,2} \\ge X_{1,2} + p_{1,2} \\cdot s_{12}^2 + (Y_{12}^2 - 1) \\cdot \\text{bigM}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "When $Y_{12}^2 = 1$, Job 2 cannot start until Job 1 finishes processing ($X_{1,2} + p_{1,2}$) PLUS the setup lag $s_{12}^2$."
       },
       {
@@ -499,7 +499,7 @@
           "$$X_{j,1} + p_{j,1} \\le 4 \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j,1} \\ge 7 \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Binary variable $Z_{j1}$ dictates whether job $j$ finishes before $t=4$ ($Z_{j1}=0$) or starts at/after $t=7$ ($Z_{j1}=1$)."
       },
       {
@@ -511,7 +511,7 @@
           "$$X_{1,2} \\ge X_{1,3} + p_{1,3}$$",
           "$$X_{1,2} + p_{1,2} \\le X_{1,3} + p_{1,3}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Equality $X_{1,2} = X_{1,3} + p_{1,3}$ forces the start time on $M_2$ to equal the exact finish time on $M_3$."
       },
       {
@@ -523,7 +523,7 @@
           "$$X_{j, l_j} + p_{j, l_j} \\le W_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j, f_j} + W_j \\ge C_{\\max} \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "The total elapsed duration is completion on last machine minus start on first machine, bounded by $W_j$."
       },
       {
@@ -535,7 +535,7 @@
           "$$X_{j\\alpha} = 0 \\quad \\forall j$$",
           "$$Y_{ij}^\\alpha = 0 \\quad \\forall i, j$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "If machine $\\alpha$ is ineligible for job $j$, operation $(j, \\alpha)$ is simply excluded from the decision variable sets."
       },
       {
@@ -547,7 +547,7 @@
           "$$T_j + \\bar{T}_j \\le d_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j, l_j} + p_{j, l_j} \\le \\bar{T}_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Since tardiness is completion time minus due date ($C_j - d_j$), bounding this difference directly by \\bar{T}_j limits maximum delay."
       },
       {
@@ -559,7 +559,7 @@
           "$$X_{j\\bar{\\alpha}} + L_{j\\alpha\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha, \\bar{\\alpha}$$",
           "$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + L_{j\\alpha\\bar{\\alpha}} \\quad \\forall j, \\alpha, \\bar{\\alpha}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Transit time $L_{j\\alpha\\bar{\\alpha}}$ acts as an additive delay after processing finishes ($X_{j\\alpha} + p_{j\\alpha}$) before starting on machine $\\bar{\\alpha}$."
       },
       {
@@ -571,7 +571,7 @@
           "$$X_{1,2} + p_{1,2} = X_{2,2} + p_{2,2}$$",
           "$$X_{1,2} + X_{2,2} = \\text{bigM}$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Setting start times equal ($X_{1,2} = X_{2,2}$) synchronizes batch loading."
       },
       {
@@ -583,7 +583,7 @@
           "$$\\sum_{j=1}^{J} (u_j \\cdot T_j) \\le B$$",
           "$$C_{\\max} \\cdot \\sum q_j \\le B$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Summing per-job earliness costs ($q_j E_j$) and fixed setup costs ($s_j$) bounds total expenditure by budget parameter $B$."
       },
       {
@@ -595,14 +595,38 @@
           "$$S_M + P_M \\le C_{\\max}$$",
           "$$X_{j\\alpha^*} \\le S_M \\quad \\forall j$$"
         ],
-        correct: 0,
+        correctIndex: 0,
         explanation: "Binary variable $V_M$ enforces disjunction between maintenance start time $S_M$ and job processing intervals."
       }
     ];
 
+    let quizData = [];
     let currentQuizIndex = 0;
     let quizScore = 0;
     let quizAnswers = {};
+
+    // Shuffles options dynamically using Fisher-Yates
+    function buildShuffledQuizData() {
+      return rawQuizData.map(q => {
+        let indices = q.options.map((_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        
+        const shuffledOptions = indices.map(idx => q.options[idx]);
+        const newCorrectIndex = indices.indexOf(q.correctIndex);
+        
+        return {
+          id: q.id,
+          title: q.title,
+          scenario: q.scenario,
+          options: shuffledOptions,
+          correct: newCorrectIndex,
+          explanation: q.explanation
+        };
+      });
+    }
 
     function initKaTeX() {
       if (window.renderMathInElement) {
@@ -710,6 +734,10 @@
       const card = document.getElementById('quiz-card');
       if (!card) return;
 
+      if (!quizData || quizData.length === 0) {
+        quizData = buildShuffledQuizData();
+      }
+
       const q = quizData[currentQuizIndex];
       const isAnswered = quizAnswers[q.id] !== undefined;
       const selectedOpt = quizAnswers[q.id];
@@ -780,6 +808,7 @@
       currentQuizIndex = 0;
       quizScore = 0;
       quizAnswers = {};
+      quizData = buildShuffledQuizData();
       document.getElementById('quiz-score').textContent = `0 / ${quizData.length}`;
       renderQuiz();
     }
