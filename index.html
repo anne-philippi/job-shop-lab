@@ -104,6 +104,7 @@
           <span>Gantt Chart</span>
           <button class="info-circle" onclick="openModal('cmax')" title="Makespan Information">i</button>
         </div>
+        <!-- Legend -->
         <div class="flex items-center gap-4 text-xs font-mono text-slate-600">
           <span class="flex items-center gap-1.5 font-semibold">
             <span class="w-3 h-3 rounded bg-[#009c3b] border border-emerald-600"></span> Job 1 (Green): M3 &rarr; M2 &rarr; M1 ($l_1 = 1$)
@@ -168,31 +169,37 @@
 
     <!-- TABS SECTION -->
     <section class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <!-- Tab Buttons -->
       <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-medium overflow-x-auto">
         <button id="tab-btn-bigm" class="px-4 py-2.5 border-b-2 border-emerald-600 text-emerald-800 bg-white font-semibold flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('bigm')">
           <span>Big-M &amp; Disjunctive Formulation</span>
-          <span class="info-circle" onclick="event.stopPropagation(); openModal('bigm')">i</span>
+          <span class="info-circle" onclick="openModalFromTab(event, 'bigm')">i</span>
         </button>
         <button id="tab-btn-maint" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('maint')">
           <span>Maintenance (1b.i)</span>
-          <span class="info-circle" onclick="event.stopPropagation(); openModal('maintenance')">i</span>
+          <span class="info-circle" onclick="openModalFromTab(event, 'maintenance')">i</span>
         </button>
         <button id="tab-btn-dairy" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('dairy')">
           <span>Dairy JIT Penalties (1b.ii)</span>
-          <span class="info-circle" onclick="event.stopPropagation(); openModal('dairy')">i</span>
+          <span class="info-circle" onclick="openModalFromTab(event, 'dairy')">i</span>
         </button>
         <button id="tab-btn-tardiness" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('tardiness')">
           <span>Tardiness Extensions (1c)</span>
-          <span class="info-circle" onclick="event.stopPropagation(); openModal('tardiness_info')">i</span>
+          <span class="info-circle" onclick="openModalFromTab(event, 'tardiness_info')">i</span>
         </button>
         <button id="tab-btn-quiz" class="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap" onclick="selectTab('quiz')">
-          <span>Hardcore Exam Prep (10 Challenges)</span>
-          <span class="info-circle" onclick="event.stopPropagation(); openModal('quiz_info')">i</span>
+          <span>Formulation Practice (Exam Prep)</span>
+          <span class="info-circle" onclick="openModalFromTab(event, 'quiz_info')">i</span>
         </button>
       </div>
 
       <!-- Tab 1: Big-M -->
       <div id="tab-content-bigm" class="p-5 space-y-4">
+        <!-- Exercise Prompt Banner -->
+        <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
+          <span class="font-bold text-emerald-800">Task 1a Question:</span> Consider a job shop scheduling problem with $J=2$ jobs and $M=3$ machines. Formulate the non-interference (disjunctive) constraints using Big-M to ensure no two jobs overlap on the same machine.
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-3">
           <p class="text-xs text-slate-500 max-w-2xl">
             Inspect how binary variable $Y_{ij}^\alpha \in \{0, 1\}$ and Big-M enforce non-overlapping processing on machine $\alpha$.
@@ -208,6 +215,11 @@
 
       <!-- Tab 2: Maintenance -->
       <div id="tab-content-maint" class="p-5 space-y-4 hidden">
+        <!-- Exercise Prompt Banner -->
+        <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
+          <span class="font-bold text-emerald-800">Task 1b.i Question:</span> Due to preventive maintenance, machine $\alpha^*$ must be fully clear by deadline time $t^*$. Formulate the mathematical constraint required to enforce this shutdown window.
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Problem 1(b.i): Machine Shutdown Constraint</h3>
@@ -240,13 +252,18 @@
 
       <!-- Tab 3: Dairy JIT -->
       <div id="tab-content-dairy" class="p-5 space-y-4 hidden">
+        <!-- Exercise Prompt Banner -->
+        <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
+          <span class="font-bold text-emerald-800">Task 1b.ii Question:</span> Consider job shop scheduling in a dairy factory with perishable products. Each job $j$ has a due date $d_j$, earliness storage cost $q_j$ per unit, and tardiness penalty $u_j$ per unit. Change the model to minimize total costs related to earliness and tardiness[cite: 15].
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Problem 1(b.ii): Perishable Dairy Factory Sandbox</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Minimize total earliness &amp; tardiness costs using completion time on last machine $l_j$.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Minimize total earliness &amp; tardiness costs using completion time on last machine $l_j$[cite: 17].</p>
           </div>
           <div class="text-right">
-            <span class="text-xs text-slate-500 block">Objective Function $\min \sum_{j=1}^{J} (E_j \cdot q_j + T_j \cdot u_j)$:</span>
+            <span class="text-xs text-slate-500 block">Objective Function $\min \sum_{j=1}^{J} (E_j \cdot q_j + T_j \cdot u_j)$[cite: 17]:</span>
             <span id="dairy-total-cost" class="text-2xl font-bold font-mono text-amber-600">0.00 €</span>
           </div>
         </div>
@@ -258,15 +275,15 @@
             </div>
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_1$)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_1$)[cite: 15]</label>
                 <input type="number" id="input-d1" min="1" max="20" step="1" value="8" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_1$/unit)[cite: 15]</label>
                 <input type="number" id="input-q1" min="0" max="100" step="0.5" value="2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-emerald-700 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_1$/unit)[cite: 15]</label>
                 <input type="number" id="input-u1" min="0" max="100" step="0.5" value="5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
@@ -282,15 +299,15 @@
             </div>
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_2$)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Due Date ($d_2$)[cite: 15]</label>
                 <input type="number" id="input-d2" min="1" max="20" step="1" value="10" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Earliness ($q_2$/unit)[cite: 15]</label>
                 <input type="number" id="input-q2" min="0" max="100" step="0.5" value="3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-yellow-700 font-bold outline-none" />
               </div>
               <div>
-                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)</label>
+                <label class="block text-slate-500 text-[10px] mb-1">Tardiness ($u_2$/unit)[cite: 15]</label>
                 <input type="number" id="input-u2" min="0" max="100" step="0.5" value="6" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-rose-600 font-bold outline-none" />
               </div>
             </div>
@@ -304,6 +321,11 @@
 
       <!-- Tab 4: Tardiness Objectives -->
       <div id="tab-content-tardiness" class="p-5 space-y-4 hidden">
+        <!-- Exercise Prompt Banner -->
+        <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-lg text-xs text-slate-700 leading-relaxed">
+          <span class="font-bold text-emerald-800">Task 1c Question:</span> Formulate alternative objective functions and necessary extra constraints for: (1) Minimizing maximum tardiness $T_{\max}$[cite: 18], (2) Minimizing average tardiness[cite: 19], and (3) Minimizing the number of tardy jobs $\sum U_j$[cite: 20].
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 class="text-sm font-semibold text-slate-800">Task 1c: Alternative Tardiness Objectives</h3>
@@ -328,11 +350,11 @@
         <div id="tardiness-display-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono"></div>
       </div>
 
-      <!-- Tab 5: Hardcore Exam Practice (10 Questions) -->
+      <!-- Tab 5: Exam Prep (10 Questions) -->
       <div id="tab-content-quiz" class="p-5 space-y-4 hidden">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 class="text-sm font-semibold text-slate-800">Hardcore Exam Prep: 10 Formulation Challenges</h3>
+            <h3 class="text-sm font-semibold text-slate-800">Formulation Practice (Exam Prep)</h3>
             <p class="text-xs text-slate-500 mt-0.5">Master constraint building for complex non-standard scheduling exam questions.</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
@@ -378,7 +400,7 @@
     </div>
   </footer>
 
-  <!-- Logic Code -->
+  <!-- Application Logic -->
   <script>
     const ops = {
       j1_m3: { job: 1, machine: 3, p: 4, start: 0, label: 'J1 on M3 (p=4)' },
@@ -393,7 +415,68 @@
     let currentTab = 'bigm';
     let currentObjMode = 'max';
 
-    // 10 Hardcore Exam Practice Questions with Corrected KaTeX Formatting
+    const concepts = {
+      jobshop: {
+        title: "Job Shop Scheduling (JSS)",
+        html: `<p>A production environment where multiple unique jobs are scheduled across several machines. Each job follows its own sequence of operations across workstations.</p>
+               <p>Key properties: non-preemptive processing, dedicated machine capacities, and strict technological sequences.</p>`
+      },
+      cmax: {
+        title: "Makespan ($C_{\\max}$)",
+        html: `<p><b>Makespan</b> is defined as the time the last job finishes and leaves the production system: $$C_{\\max} = \\max(C_1, C_2, \\dots, C_n)$$</p>
+               <p>Minimizing makespan maximizes machine throughput and resource utilization.</p>
+               <p>In Mixed Integer Programming (MIP), it is linearized with bounding constraints over all jobs $j$ and machines $\\alpha$: $$C_{\\max} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha$$</p>`
+      },
+      alpha: {
+        title: "Machine Indices ($\\alpha, \\bar{\\alpha}$)",
+        html: `<p>$\\alpha$ denotes the current machine, and $\\bar{\\alpha}$ denotes the immediate successor machine along job $j$'s routing path.</p>
+               <p>The parameter $a_{j\\alpha\\bar{\\alpha}} = 1$ indicates that job $j$ visits machine $\\alpha$ directly before $\\bar{\\alpha}$.</p>`
+      },
+      precedence: {
+        title: "Technological Precedence Constraints",
+        html: `<p>Ensures that an operation cannot start until the immediately preceding operation of the same job has finished processing:</p>
+               <p>$$X_{j\\bar{\\alpha}} \\ge X_{j\\alpha} + p_{j\\alpha} \\quad \\forall j, \\alpha, \\bar{\\alpha} \\text{ with } a_{j\\alpha\\bar{\\alpha}} = 1$$</p>`
+      },
+      bigm: {
+        title: "Big-M Disjunctive Formulation",
+        html: `<p>Disjunctive constraints prevent two jobs from being processed simultaneously on the same machine:</p>
+               <p>$$X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha} + (Y_{ij}^\\alpha - 1) \\cdot \\text{bigM}$$</p>
+               <p>When $Y_{ij}^\\alpha = 1$, the constraint activates ($X_{j\\alpha} \\ge X_{i\\alpha} + p_{i\\alpha}$). When $Y_{ij}^\\alpha = 0$, the constraint relaxes because $-\\text{bigM}$ drops the right-hand side well below 0.</p>`
+      },
+      maintenance: {
+        title: "Preventive Maintenance (1b.i)",
+        html: `<p>$$X_{j\\alpha^*} + p_{j\\alpha^*} \\le t^* \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>
+               <p>1. $X_{j\\alpha^*} + p_{j\\alpha^*}$ gives the completion time of job $j$ on machine $\\alpha^*$.</p>
+               <p>2. Setting this completion time $\\le t^*$ for all jobs ensures all work finishes before $t^*$.</p>
+               <p>3. This frees up machine $\\alpha^*$ starting at time $t^*$ for preventive maintenance.</p>`
+      },
+      dairy: {
+        title: "Perishable Dairy Earliness & Tardiness Model (1b.ii)",
+        html: `<p><b>New Parameters:</b> $d_j$ (due date), $q_j$ (earliness cost/unit), $u_j$ (tardiness penalty/unit), $l_j$ (last machine visited by job $j$).</p>
+               <p><b>New Variables:</b> $E_j \\ge 0$ (earliness), $T_j \\ge 0$ (tardiness).</p>
+               <p><b>Objective Function:</b></p>
+               <p>$$\\text{Minimize } \\sum_{j=1}^{J} (E_j \\cdot q_j + T_j \\cdot u_j)$$</p>
+               <p><b>Constraints:</b></p>
+               <p>$$E_j \\ge d_j - X_{j, l_j} - p_{j, l_j} \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>
+               <p>$$T_j \\ge X_{j, l_j} + p_{j, l_j} - d_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$</p>`
+      },
+      tardiness_info: {
+        title: "Task 1c: Alternative Tardiness Objectives",
+        html: `<p><b>1. Minimize Maximum Tardiness ($T_{\\max}$):</b></p>
+               <p>Linearized by introducing variable $T_{\\max} \\ge 0$ with constraint $$T_{\\max} \\ge X_{j, l_j} + p_{j, l_j} - d_j \\quad \\forall j$$</p>
+               <p><b>2. Minimize Average Tardiness:</b></p>
+               <p>$$\\text{Minimize } \\frac{1}{J}\\sum_{j=1}^{J} T_j$$ using standard tardiness definition $T_j \\ge X_{j, l_j} + p_{j, l_j} - d_j$.</p>
+               <p><b>3. Minimize Number of Tardy Jobs ($\sum U_j$):</b></p>
+               <p>Introduces binary variable $U_j \\in \\{0, 1\\}$ activated via Big-M: $$X_{j, l_j} + p_{j, l_j} - d_j \\le \\text{bigM} \\cdot U_j \\quad \\forall j$$</p>`
+      },
+      quiz_info: {
+        title: "Formulation Practice (Exam Prep)",
+        html: `<p>Practicing algebraic formulations under constraint variations is key for the OPM 5610 exam.</p>
+               <p>Work through the multiple-choice prompts to test your logic on setup times, breakdowns, no-wait rules, and shelf-life limits!</p>`
+      }
+    };
+
+    // 10 Exam Practice Questions
     const quizData = [
       {
         id: 1,
@@ -457,15 +540,15 @@
       },
       {
         id: 6,
-        title: "Challenge 6: Strict Upper Bound on Individual Job Tardiness ($\bar{T}_j$)",
-        scenario: "A contract specifies that tardiness $T_j$ for job $j$ must never exceed maximum allowed limit $\\bar{T}_j$. Which constraint enforces this?",
+        title: "Challenge 6: Strict Upper Bound on Individual Job Tardiness (\\bar{T}_j)",
+        scenario: "A contract specifies that tardiness $T_j$ for job $j$ must never exceed maximum allowed limit \\bar{T}_j. Which constraint enforces this?",
         options: [
           "$$X_{j, l_j} + p_{j, l_j} - d_j \\le \\bar{T}_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$T_j + \\bar{T}_j \\le d_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$",
           "$$X_{j, l_j} + p_{j, l_j} \\le \\bar{T}_j \\quad \\forall j \\in \\{1, \\dots, J\\}$$"
         ],
         correct: 0,
-        explanation: "Since tardiness is completion time minus due date ($C_j - d_j$), bounding this difference directly by $\\bar{T}_j$ limits maximum delay."
+        explanation: "Since tardiness is completion time minus due date ($C_j - d_j$), bounding this difference directly by \\bar{T}_j limits maximum delay."
       },
       {
         id: 7,
@@ -549,6 +632,11 @@
           throwOnError: false
         });
       }
+    }
+
+    function openModalFromTab(evt, key) {
+      evt.stopPropagation();
+      openModal(key);
     }
 
     function closeModal() {
