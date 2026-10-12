@@ -266,8 +266,8 @@
               <div class="text-[11px] text-slate-600 mt-1">High holding/spoilage penalty ($q_1=8, q_2=10$). Model prefers finishing slightly late over storing perishable goods.</div>
             </button>
             <button id="preset-auto" onclick="setScenario('auto')" class="p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
-              <div class="font-bold font-mono text-amber-800">2. Automotive JIT ($u_j \gg q_j$)</div>
-              <div class="text-[11px] text-slate-600 mt-1">Extreme late penalty ($u_1=25, u_2=30$). Late assembly stops OEM lines. Model prefers buffering early.</div>
+              <div class="font-bold font-mono text-amber-800">2. Automotive JIT / JIS ($u_j \gg q_j$)</div>
+              <div class="text-[11px] text-slate-600 mt-1">Extreme late penalty ($u_1=25, u_2=30$). Late parts stop OEM car lines. Model buffers production early.</div>
             </button>
             <button id="preset-tech" onclick="setScenario('tech')" class="p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
               <div class="font-bold font-mono text-sky-800">3. High-Tech / Cleanroom ($q_j \approx u_j$)</div>
@@ -667,14 +667,8 @@
       }
     }
 
-    function openModal(key) {
-      const data = concepts[key];
-      if (!data) return;
-      document.getElementById('modal-title').textContent = data.title;
-      const el = document.getElementById('modal-content');
-      el.innerHTML = data.html;
-      document.getElementById('concept-modal').classList.remove('hidden');
-      if (window.renderMathInElement) {
+    function renderMathForElement(el) {
+      if (window.renderMathInElement && el) {
         renderMathInElement(el, {
           delimiters: [
             { left: '$$', right: '$$', display: true },
@@ -683,6 +677,16 @@
           throwOnError: false
         });
       }
+    }
+
+    function openModal(key) {
+      const data = concepts[key];
+      if (!data) return;
+      document.getElementById('modal-title').textContent = data.title;
+      const el = document.getElementById('modal-content');
+      el.innerHTML = data.html;
+      document.getElementById('concept-modal').classList.remove('hidden');
+      renderMathForElement(el);
     }
 
     function openModalFromTab(evt, key) {
@@ -764,6 +768,7 @@
 
       const title = document.getElementById('scenario-title');
       const desc = document.getElementById('scenario-desc');
+      const banner = document.getElementById('industry-scenario-banner');
 
       [btnDairy, btnAuto, btnTech].forEach(b => {
         b.className = "p-3 rounded-lg border text-left transition bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm";
@@ -776,8 +781,8 @@
         document.getElementById('input-q2').value = 10;
         document.getElementById('input-u2').value = 4;
 
-        title.textContent = "Selected Trade-off: Dairy & Perishable Foods (q_j > u_j)";
-        desc.textContent = "Refrigeration energy and finite shelf-life mean storing finished dairy products early costs more per hour than minor customer delay. The optimizer actively penalizes earliness E_j.";
+        title.innerHTML = "Selected Trade-off: Dairy &amp; Perishable Foods ($q_j > u_j$)";
+        desc.innerHTML = "<b>Educational Insight:</b> Fresh milk, yogurt, and cheese degrade quickly and require energy-intensive cold storage. Finishing early ($E_j > 0$) causes spoilage write-offs and occupies refrigerated warehouse capacity. Therefore, holding cost $q_j$ is high ($q_j > u_j$), encouraging the optimizer to produce products as close to departure time as possible—even accepting minor delay $T_j$ over early holding.";
       } else if (type === 'auto') {
         btnAuto.className = "p-3 rounded-lg border text-left transition bg-amber-50 border-amber-500 text-amber-900 font-semibold shadow-sm";
         document.getElementById('input-q1').value = 1;
@@ -785,8 +790,8 @@
         document.getElementById('input-q2').value = 2;
         document.getElementById('input-u2').value = 30;
 
-        title.textContent = "Selected Trade-off: Automotive Just-In-Sequence (u_j >> q_j)";
-        desc.textContent = "Late deliveries stop an OEM assembly line costing up to €10,000/min in contractual fines. Storing modules in staging yards (q_j) is cheap, so the model buffers production early.";
+        title.innerHTML = "Selected Trade-off: Automotive Just-In-Sequence ($u_j \\gg q_j$)";
+        desc.innerHTML = "<b>Educational Insight:</b> Automotive OEMs (e.g., BMW, Mercedes) build vehicles in exact customer sequences without stock buffers. If a supplier delays a car seat module by even 10 minutes, the entire car assembly line stops, triggering contractual fines of up to €10,000/minute. Because tardiness $u_j$ is extreme ($u_j \\gg q_j$), storing modules early in staging yards ($q_j$) is negligible, forcing the model to complete jobs early ($E_j > 0$) to guarantee zero line stoppages.";
       } else if (type === 'tech') {
         btnTech.className = "p-3 rounded-lg border text-left transition bg-sky-50 border-sky-500 text-sky-900 font-semibold shadow-sm";
         document.getElementById('input-q1').value = 5;
@@ -794,11 +799,12 @@
         document.getElementById('input-q2').value = 5;
         document.getElementById('input-u2').value = 6;
 
-        title.textContent = "Selected Trade-off: High-Tech Cleanroom Electronics (q_j ≈ u_j)";
-        desc.textContent = "Cleanroom storage carries airborne contamination risks and high tied-up working capital (q_j), balanced evenly against customer delivery windows (u_j).";
+        title.innerHTML = "Selected Trade-off: High-Tech Cleanroom Electronics ($q_j \\approx u_j$)";
+        desc.innerHTML = "<b>Educational Insight:</b> Silicon wafers and microchips carry high capital value and are vulnerable to airborne molecular contamination in cleanrooms ($q_j$). However, missing product launch windows also causes heavy market share loss ($u_j$). Equal weights balancing $q_j \\approx u_j$ force strict JIT alignment with minimal tolerance on either side.";
       }
 
       evaluate();
+      renderMathForElement(banner);
     }
 
     function renderQuiz() {
@@ -846,15 +852,7 @@
         </div>
       `;
 
-      if (window.renderMathInElement) {
-        renderMathInElement(card, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
-          ],
-          throwOnError: false
-        });
-      }
+      renderMathForElement(card);
     }
 
     function answerQuiz(optionIdx) {
@@ -1064,15 +1062,7 @@
         `;
       }).join('');
 
-      if (window.renderMathInElement) {
-        renderMathInElement(container, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
-          ],
-          throwOnError: false
-        });
-      }
+      renderMathForElement(container);
     }
 
     function updateTardinessExtensions(c1, c2, d1, d2, t1, t2) {
@@ -1150,16 +1140,7 @@
       }
 
       container.innerHTML = card1HTML + card2HTML;
-
-      if (window.renderMathInElement) {
-        renderMathInElement(container, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
-          ],
-          throwOnError: false
-        });
-      }
+      renderMathForElement(container);
     }
 
     document.getElementById('btn-solution').onclick = () => {
@@ -1192,6 +1173,8 @@
 
     buildPills();
     render();
+    // Render math on page load
+    renderMathForElement(document.getElementById('industry-scenario-banner'));
   </script>
 </body>
 </html>
